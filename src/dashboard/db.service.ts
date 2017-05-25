@@ -27,7 +27,7 @@ export interface Clearable {
   clear(): Promise<void>;
 }
 
-type Confirmer = (message: string) => Promise<boolean>;
+export type Confirmer = (message: string) => Promise<boolean>;
 export type WriteCheckResult<Value> = {write: boolean, record: Value | null};
 
 export type NameIdArray<Key> = {name: string, id: Key}[];

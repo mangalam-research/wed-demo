@@ -76,8 +76,8 @@ export function filesEqual(a: File, b: File): Promise<boolean> {
     });
 }
 
-type FormErrors = {[name: string]: string };
-type ValidationMessages = {[name: string]: {[name: string]: string}};
+export type FormErrors = {[name: string]: string };
+export type ValidationMessages = {[name: string]: {[name: string]: string}};
 
 export function updateFormErrors(ngForm: NgForm,
                                  formErrors: FormErrors,
