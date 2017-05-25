@@ -1,7 +1,10 @@
 module.exports = {
   extends: [
-    "lddubeau-base"
+    "lddubeau-base/es5"
   ],
+  env: {
+    amd: true,
+  },
   rules: {
     "no-continue": "off",
     "import/no-extraneous-dependencies": "off",
