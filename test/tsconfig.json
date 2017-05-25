@@ -1,14 +1,14 @@
 {
-  "extends": "../src/tsconfig",
+  "extends": "../tsconfig-common.json",
   "compilerOptions": {
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "dashboard/*": ["../src/dashboard/*"]
+      "dashboard/*": ["../build/dev/lib/dashboard/*"]
     }
   },
   "include": [
     "**/*.ts",
     "../src/**/*.d.ts"
-  ],
-  "exclude": []
+  ]
 }
