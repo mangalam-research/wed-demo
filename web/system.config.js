@@ -8,10 +8,10 @@
 // SystemJS (contrarily to RequireJS) does not handle changing the baseURL.
 // See: https://github.com/systemjs/systemjs/issues/1208#issuecomment-215707469
 window.systemJSConfig = {
-  baseURL: "lib/",
+  baseURL: "..",
   pluginFirst: true,
   paths: {
-    "npm:": "../../../node_modules/",
+    "npm:": "/node_modules/",
   },
   map: {
     "@angular/core": "npm:@angular/core",
@@ -37,6 +37,7 @@ window.systemJSConfig = {
     bluejax: "npm:bluejax",
     "bluejax.try": "npm:bluejax.try",
     rangy: "npm:rangy",
+    wed: "npm:wed/standalone/lib/wed",
   },
   meta: {
     "mmwp/internal-schemas/*": {
