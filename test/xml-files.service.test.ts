@@ -4,11 +4,11 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { XMLFile } from "../dashboard/xml-file";
-import { XMLFilesService } from "../dashboard/xml-files.service";
+import { ChunksService } from "dashboard/chunks.service";
+import { XMLFile } from "dashboard/xml-file";
+import { XMLFilesService } from "dashboard/xml-files.service";
 
 describe("XMLFilesService", () => {
   let service: XMLFilesService;

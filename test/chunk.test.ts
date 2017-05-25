@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { Chunk } from "../dashboard/chunk";
+import { Chunk } from "dashboard/chunk";
 
 describe("Chunk", () => {
   let one: Chunk;

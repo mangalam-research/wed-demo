@@ -11,10 +11,10 @@ const expect = chai.expect;
 // DBService is an abstract class, so we have to test it through
 // something. We use XMLFilesService for this job.
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { db } from "../dashboard/store";
-import { XMLFile } from "../dashboard/xml-file";
-import { XMLFilesService } from "../dashboard/xml-files.service";
+import { ChunksService } from "dashboard/chunks.service";
+import { db } from "dashboard/store";
+import { XMLFile } from "dashboard/xml-file";
+import { XMLFilesService } from "dashboard/xml-files.service";
 
 describe("DBService", () => {
   let chunksService: ChunksService;

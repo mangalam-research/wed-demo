@@ -5,11 +5,11 @@ import "mocha";
 chai.config.truncateThreshold = 0;
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { Pack } from "../dashboard/pack";
-import { PacksService } from "../dashboard/packs.service";
+import { ChunksService } from "dashboard/chunks.service";
+import { Pack } from "dashboard/pack";
+import { PacksService } from "dashboard/packs.service";
 
 describe("PacksService", () => {
   let chunkService: ChunksService;

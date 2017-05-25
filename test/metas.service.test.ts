@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { MetasService } from "../dashboard/metas.service";
+import { MetasService } from "dashboard/metas.service";
 
 describe("MetasService", () => {
   // There is not a lot to gain from trying to test this in more details.

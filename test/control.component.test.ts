@@ -10,16 +10,16 @@ import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { ConfirmService } from "../dashboard/confirm.service";
-import { ControlComponent } from "../dashboard/control.component";
-import { MetadataService } from "../dashboard/metadata.service";
-import { PacksService } from "../dashboard/packs.service";
-import { ProcessingService } from "../dashboard/processing.service";
-import { SchemasService } from "../dashboard/schemas.service";
-import { XMLFilesService } from "../dashboard/xml-files.service";
+import { ChunksService } from "dashboard/chunks.service";
+import { ConfirmService } from "dashboard/confirm.service";
+import { ControlComponent } from "dashboard/control.component";
+import { MetadataService } from "dashboard/metadata.service";
+import { PacksService } from "dashboard/packs.service";
+import { ProcessingService } from "dashboard/processing.service";
+import { SchemasService } from "dashboard/schemas.service";
+import { XMLFilesService } from "dashboard/xml-files.service";
 import { waitForSuccess } from "./util";
 
 //

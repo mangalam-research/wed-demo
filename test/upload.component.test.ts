@@ -9,10 +9,10 @@ import { DebugElement } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 
-import { ConfirmService } from "../dashboard/confirm.service";
-import { Loader } from "../dashboard/db.service";
-import { ProcessingService } from "../dashboard/processing.service";
-import { UploadComponent } from "../dashboard/upload.component";
+import { ConfirmService } from "dashboard/confirm.service";
+import { Loader } from "dashboard/db.service";
+import { ProcessingService } from "dashboard/processing.service";
+import { UploadComponent } from "dashboard/upload.component";
 
 // Any is too useful in the suite.
 // tslint:disable:no-any

@@ -5,7 +5,7 @@ import "mocha";
 const expect = chai.expect;
 
 // RecordCommon is an abstract class. We'll test it through XMLFile.
-import { XMLFile } from "../dashboard/xml-file";
+import { XMLFile } from "dashboard/xml-file";
 
 describe("RecordCommon", () => {
   let one: XMLFile;

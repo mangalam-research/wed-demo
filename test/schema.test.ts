@@ -4,10 +4,10 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { Chunk } from "../dashboard/chunk";
-import { Schema } from "../dashboard/schema";
+import { Chunk } from "dashboard/chunk";
+import { Schema } from "dashboard/schema";
 
 describe("Schema", () => {
   let chunkOne: Chunk;

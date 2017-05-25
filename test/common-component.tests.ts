@@ -1,11 +1,11 @@
 import { ComponentFixture } from "@angular/core/testing";
 import * as sinon from "sinon";
 
-import { DBService } from "../dashboard/db.service";
+import { DBService } from "dashboard/db.service";
 import {
   GenericRecordsComponent,
-} from "../dashboard/generic-records.component";
-import { RecordCommon } from "../dashboard/record-common";
+} from "dashboard/generic-records.component";
+import { RecordCommon } from "dashboard/record-common";
 
 import { TestSuite } from "./test-framework";
 import { waitForSuccess } from "./util";

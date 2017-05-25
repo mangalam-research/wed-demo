@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { ModesService } from "../dashboard/modes.service";
+import { ModesService } from "dashboard/modes.service";
 
 describe("ModesService", () => {
   // There is not a lot to gain from trying to test this in more details.

@@ -9,9 +9,9 @@ import { DebugElement } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 
-import { ClearStoreComponent } from "../dashboard/clear-store.component";
-import { ConfirmService } from "../dashboard/confirm.service";
-import { Clearable } from "../dashboard/db.service";
+import { ClearStoreComponent } from "dashboard/clear-store.component";
+import { ConfirmService } from "dashboard/confirm.service";
+import { Clearable } from "dashboard/db.service";
 
 class FakeClearable implements Clearable {
   clear(): Promise<void> {

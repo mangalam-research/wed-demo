@@ -4,11 +4,11 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { Chunk } from "../dashboard/chunk";
-import { ChunksService } from "../dashboard/chunks.service";
-import { readFile } from "../dashboard/store-util";
+import { Chunk } from "dashboard/chunk";
+import { ChunksService } from "dashboard/chunks.service";
+import { readFile } from "dashboard/store-util";
 
 describe("ChunksService", () => {
   let service: ChunksService;

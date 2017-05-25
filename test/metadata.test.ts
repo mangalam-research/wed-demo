@@ -4,10 +4,10 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { Chunk } from "../dashboard/chunk";
-import { Metadata } from "../dashboard/metadata";
+import { Chunk } from "dashboard/chunk";
+import { Metadata } from "dashboard/metadata";
 
 describe("Metadata", () => {
   // tslint:disable-next-line:mocha-no-side-effect-code

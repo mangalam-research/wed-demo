@@ -5,7 +5,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
 // Any is too useful in this test suite.
 // tslint:disable:no-any

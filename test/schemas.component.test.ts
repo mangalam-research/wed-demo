@@ -9,15 +9,15 @@ import { ComponentFixture, ComponentFixtureAutoDetect,
 import { By } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { ClearStoreComponent } from "../dashboard/clear-store.component";
-import { ConfirmService } from "../dashboard/confirm.service";
-import { ProcessingService } from "../dashboard/processing.service";
-import { SchemasComponent } from "../dashboard/schemas.component";
-import { SchemasService } from "../dashboard/schemas.service";
-import { UploadComponent } from "../dashboard/upload.component";
+import { ChunksService } from "dashboard/chunks.service";
+import { ClearStoreComponent } from "dashboard/clear-store.component";
+import { ConfirmService } from "dashboard/confirm.service";
+import { ProcessingService } from "dashboard/processing.service";
+import { SchemasComponent } from "dashboard/schemas.component";
+import { SchemasService } from "dashboard/schemas.service";
+import { UploadComponent } from "dashboard/upload.component";
 
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";

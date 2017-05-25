@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { Pack } from "../dashboard/pack";
+import { Pack } from "dashboard/pack";
 
 describe("Pack", () => {
   // tslint:disable-next-line:mocha-no-side-effect-code

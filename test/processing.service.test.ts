@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { ProcessingService } from "../dashboard/processing.service";
+import { ProcessingService } from "dashboard/processing.service";
 
 describe("ProcessingService", () => {
   let service: ProcessingService;

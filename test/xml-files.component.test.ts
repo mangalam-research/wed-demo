@@ -11,17 +11,17 @@ import { ComponentFixture, ComponentFixtureAutoDetect,
 import { By } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 
-import { db } from "../dashboard/store";
+import { db } from "dashboard/store";
 
-import { ChunksService } from "../dashboard/chunks.service";
-import { ClearStoreComponent } from "../dashboard/clear-store.component";
-import { ConfirmService } from "../dashboard/confirm.service";
-import { PacksService } from "../dashboard/packs.service";
-import { ProcessingService } from "../dashboard/processing.service";
-import { UploadComponent } from "../dashboard/upload.component";
-import { XMLFile } from "../dashboard/xml-file";
-import { XMLFilesComponent } from "../dashboard/xml-files.component";
-import { XMLFilesService } from "../dashboard/xml-files.service";
+import { ChunksService } from "dashboard/chunks.service";
+import { ClearStoreComponent } from "dashboard/clear-store.component";
+import { ConfirmService } from "dashboard/confirm.service";
+import { PacksService } from "dashboard/packs.service";
+import { ProcessingService } from "dashboard/processing.service";
+import { UploadComponent } from "dashboard/upload.component";
+import { XMLFile } from "dashboard/xml-file";
+import { XMLFilesComponent } from "dashboard/xml-files.component";
+import { XMLFilesService } from "dashboard/xml-files.service";
 
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";

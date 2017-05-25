@@ -8,7 +8,7 @@
   window.__karma__.loaded = function loaded() {};
 
   var allTestFiles = [];
-  var TEST_REGEXP = /web\/test\/(?!karma-main).*\.js$/i;
+  var TEST_REGEXP = /test\/(?!karma-main).*\.js$/i;
 
   Object.keys(window.__karma__.files).forEach(function forEach(file) {
     if (TEST_REGEXP.test(file)) {
@@ -17,18 +17,12 @@
     }
   });
   var config = window.systemJSConfig;
-  config.baseURL = "/base/build/standalone/lib/";
+  config.baseURL = "/base/build/dev/lib/";
   config.paths["npm:"] = "/base/node_modules/";
   config.map["chai-as-promised"] = "npm:chai-as-promised/lib/chai-as-promised.js";
   config.map.sinon = "npm:sinon";
   config.map["sinon-chai"] = "npm:sinon-chai";
   config.map["check-error"] = "npm:check-error/check-error.js";
-  config.packages[""].map = {
-    "../dashboard": "/base/build/standalone/lib/dashboard",
-    "../../dashboard": "/base/build/standalone/lib/dashboard",
-    "../../mmwp": "/base/build/standalone/lib/mmwp",
-    "../../../mmwp": "/base/build/standalone/lib/mmwp",
-  };
   SystemJS.config(config);
 
   // These are preloaded by Karma as scripts that leak into the global space.
