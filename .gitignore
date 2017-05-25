@@ -1,0 +1,7 @@
+/node_modules
+/build
+/gulp.local.js
+/*.html
+*_flymake.*
+*.pyc
+/.venv
