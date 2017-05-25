@@ -32,7 +32,7 @@ export class ChunksService {
 
   updateRecord(record: Chunk): Promise<Chunk> {
     return this.getRecordById(record.id)
-      .then((found: Chunk | undefined) => {
+      .then((found) => {
          // We disallow any update that changes a chunk.
         if (found !== undefined) {
           return filesEqual(record.file, found.file)
@@ -43,7 +43,7 @@ export class ChunksService {
             });
         }
 
-        return this.table.put(record);
+        return this.table.put(record).then(() => undefined);
       })
       .then(() => record);
   };
