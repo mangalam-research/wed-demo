@@ -15,8 +15,6 @@ define(function f(require) {
   var URI = require("urijs/URI");
   var lr = require("last-resort");
   var onerror = require("wed/onerror");
-  var globalConfig = require("global-config");
-  var mergeOptions = require("merge-options");
   var Promise = require("bluebird");
 
   // This installs last-resort on our current window and registers with it
@@ -217,8 +215,7 @@ define(function f(require) {
         $(function ready() {
           var widget = document.getElementById("widget");
           window.wed_editor = new wed.Editor();
-          var finalOptions = mergeOptions({}, globalConfig.config, options);
-          window.wed_editor.init(widget, finalOptions, text);
+          window.wed_editor.init(widget, options, text);
         });
       });
   });
