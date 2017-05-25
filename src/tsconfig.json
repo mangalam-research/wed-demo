@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
     "rootDir": ".",
-    "baseUrl": ".",
-    "paths": {
-      "wed/*": ["../build/standalone/lib/wed/*"]
-    },
     "module": "amd",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -26,8 +22,5 @@
   "include": [
     "**/*.ts",
     "**/*.d.ts"
-  ],
-  "exclude": [
-    "test/**/*.ts"
   ]
 }
