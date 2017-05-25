@@ -1,31 +1,18 @@
 const gulp = require("gulp");
 const gulpNewer = require("gulp-newer");
-const gulpFilter = require("gulp-filter");
-const less = require("gulp-less");
-const rename = require("gulp-rename");
-const changed = require("gulp-changed");
-const es = require("event-stream");
-const vinylFile = require("vinyl-file");
 const Promise = require("bluebird");
 const path = require("path");
-const gutil = require("gulp-util");
-const glob = require("glob");
-const shell = require("shell-quote");
+const es = require("event-stream");
 const requireDir = require("require-dir");
-const rjs = require("requirejs");
-const wrapAmd = require("gulp-wrap-amd");
 const eslint = require("gulp-eslint");
 const replace = require("gulp-replace");
-const versync = require("versync");
-const webpack = require("webpack");
+// const webpack = require("webpack");
 const argparse = require("argparse");
 const gulpTs = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
-const webWebpackConfig = require("../web/webpack.config");
+// const webWebpackConfig = require("../web/webpack.config");
 const config = require("./config");
-const { sameFiles, del, newer, exec, checkOutputFile, touchAsync, cprp,
-        cprpdir, spawn, existsInFile, sequence, mkdirpAsync, fs, stampPath }
-      = require("./util");
+const { del, newer, exec, spawn, mkdirpAsync } = require("./util");
 
 const ArgumentParser = argparse.ArgumentParser;
 
@@ -121,8 +108,6 @@ gulp.task("copy-other",
           .pipe(gulp.dest("build/dev/lib/")));
 
 gulp.task("build-dev", ["tsc", "copy-other"]);
-
-gulp.task("stamp-dir", () => mkdirpAsync(config.internals.stampDir));
 
 gulp.task("build-info", Promise.coroutine(function *task() {
   const dest = "build/dev/lib/build-info.js";
