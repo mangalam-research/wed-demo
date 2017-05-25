@@ -12,7 +12,8 @@ const gulpTs = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 // const webWebpackConfig = require("../web/webpack.config");
 const config = require("./config");
-const { del, newer, exec, spawn, mkdirpAsync } = require("./util");
+const { del, fs, newer, exec, execFile, spawn,
+        mkdirpAsync } = require("./util");
 
 const ArgumentParser = argparse.ArgumentParser;
 
@@ -103,11 +104,23 @@ const project = gulpTs.createProject("src/tsconfig.json");
 // The web part depends on the results of compiling wed.
 gulp.task("tsc", () => tsc(project));
 
+gulp.task("copy-package-info", () => {
+  const dest = "build/";
+  return gulp.src(
+    [
+      "package.json",
+      "README.md",
+    ],
+    { base: "." })
+    .pipe(gulpNewer(dest))
+    .pipe(gulp.dest(dest));
+});
+
 gulp.task("copy-other",
           () => gulp.src(["web/**/*.{js,html,css}", "src/**/*.{js,html,css}"])
           .pipe(gulp.dest("build/dev/lib/")));
 
-gulp.task("build-dev", ["tsc", "copy-other"]);
+gulp.task("build-dev", ["tsc", "copy-other", "copy-package-info"]);
 
 gulp.task("build-info", Promise.coroutine(function *task() {
   const dest = "build/dev/lib/build-info.js";
@@ -144,11 +157,12 @@ function runTslint(tsconfig, tslintConfig) {
     { stdio: "inherit" });
 }
 
-gulp.task("tslint", () => runTslint("src/tsconfig.json", "src/tslint.json"));
+gulp.task("tslint-src", () => runTslint("src/tsconfig.json", "src/tslint.json"));
 
-gulp.task("tslint-test", () => runTslint("web/test/tsconfig.json", "web/tslint.json"));
+gulp.task("tslint-test", ["tsc"],
+          () => runTslint("test/tsconfig.json", "src/tslint.json"));
 
-gulp.task("tslint", ["tslint-web", "tslint-web-test"]);
+gulp.task("tslint", ["tslint-src", "tslint-test"]);
 
 gulp.task("eslint", () =>
           gulp.src(["lib/**/*.js", "*.js", "bin/**", "config/**/*.js",
@@ -172,8 +186,32 @@ function runKarma(localOptions) {
   return spawn("./node_modules/.bin/karma", localOptions, { stdio: "inherit" });
 }
 
-gulp.task("karma", ["build-dev"],
+gulp.task("test-karma", ["build-dev"],
           () => runKarma(["start", "--single-run"]));
+
+gulp.task("test", ["test-karma", "tslint", "eslint"]);
+
+let packname;
+gulp.task("pack", ["test"],
+  () => execFile("npm", ["pack", "."], { cwd: "build" })
+    .then(([_packname]) => {
+      packname = _packname.trim();
+    }));
+
+gulp.task("pack-notest", ["default"],
+          () => execFile("npm", ["pack", "."], { cwd: "build" }));
+
+gulp.task("install-test", ["pack"], Promise.coroutine(function *install() {
+  const testDir = "build/install_dir";
+  yield del(testDir);
+  yield fs.mkdirAsync(testDir);
+  yield fs.mkdirAsync(path.join(testDir, "node_modules"));
+  yield execFile("npm", ["install", `../${packname}`], { cwd: testDir });
+  yield del(testDir);
+}));
+
+gulp.task("publish", ["install-test"],
+          () => execFile("npm", ["publish", packname], { cwd: "build" }));
 
 gulp.task("clean", () => del(["build", "*.html"]));
 

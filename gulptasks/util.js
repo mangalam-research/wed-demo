@@ -7,7 +7,6 @@ const _fs = require("fs-extra");
 const _del = require("del");
 const touch = require("touch");
 const path = require("path");
-const { internals } = require("./config");
 
 const fs = Promise.promisifyAll(_fs);
 exports.fs = fs;
@@ -48,6 +47,19 @@ exports.exec = function exec(command, options) {
         reject(err);
       }
       resolve(stdout, stderr);
+    });
+  });
+};
+
+exports.execFile = function execFile(command, args, options) {
+  return new Promise((resolve, reject) => {
+    childProcess.execFile(command, args, options, (err, stdout, stderr) => {
+      if (err) {
+        gutil.log(stdout);
+        gutil.log(stderr);
+        reject(err);
+      }
+      resolve([stdout, stderr]);
     });
   });
 };
