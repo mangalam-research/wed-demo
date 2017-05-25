@@ -16,13 +16,13 @@ const serveStatic = require("serve-static");
 // - The gulp-typescript it uses does not support "extends".
 //
 
-function makeServeMiddleware(config) {
+function makeServeMiddleware(/* config */) {
   const serve = serveStatic("./node_modules", {
     index: false,
   });
 
   const baseURL = "/base/node_modules/";
-  return function (req, resp, next) {
+  return function handle(req, resp, next) {
     if (req.url.lastIndexOf(baseURL, 0) === 0) {
       req.url = req.url.slice(baseURL.length);
       serve(req, resp, next);
@@ -61,7 +61,7 @@ module.exports = function configure(config) {
       //
       ["zone", "long-stack-trace-zone", "proxy", "sync-test",
        "async-test", "fake-async-test", "mocha-patch"].map(
-                    (x) => `node_modules/zone.js/dist/${x}.js`),
+                    x => `node_modules/zone.js/dist/${x}.js`),
       "node_modules/wed/standalone/lib/external/classList.js",
       "node_modules/wed/standalone/lib/wed/polyfills/contains.js",
       "node_modules/wed/standalone/lib/wed/polyfills/matches.js",
@@ -81,6 +81,7 @@ module.exports = function configure(config) {
     typescriptPreprocessor: {
       tsconfigPath: "./test/tsconfig.json",
       compilerOptions: {
+        // eslint-disable-next-line global-require
         typescript: require("typescript"),
         sourceMap: false,
         // We have to have them inline for the browser to find them.
