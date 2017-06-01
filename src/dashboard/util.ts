@@ -92,7 +92,13 @@ export function updateFormErrors(ngForm: NgForm,
 
     if (control != null && control.dirty && !control.valid) {
       const messages = validationMessages[field];
-      for (const key in control.errors) {
+      const errors = control.errors;
+
+      if (errors === null) {
+        throw new Error("control is invalid but has no errors");
+      }
+
+      for (const key in errors) {
         formErrors[field] += `${messages[key]} `;
       }
     }

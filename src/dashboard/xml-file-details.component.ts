@@ -69,7 +69,8 @@ export class XMLFileDetailsComponent implements OnInit {
 
     this.form = this.currentForm;
     if (this.form !== undefined) {
-      this.formSub = this.form.valueChanges
+      // tslint:disable-next-line:no-non-null-assertion
+      this.formSub = this.form.valueChanges!
         .subscribe(() => {
           this.onValueChanged();
         });
