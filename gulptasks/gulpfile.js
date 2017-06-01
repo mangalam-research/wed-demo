@@ -153,14 +153,15 @@ gulp.task("default", ["build"]);
 function runTslint(tsconfig, tslintConfig) {
   return spawn(
     "./node_modules/.bin/tslint",
-    ["--type-check", "--project", tsconfig, "-c", tslintConfig],
+    ["--type-check", "--project", tsconfig, "-c", tslintConfig,
+     "-t", "verbose"],
     { stdio: "inherit" });
 }
 
 gulp.task("tslint-src", () => runTslint("src/tsconfig.json", "src/tslint.json"));
 
 gulp.task("tslint-test", ["tsc"],
-          () => runTslint("test/tsconfig.json", "src/tslint.json"));
+          () => runTslint("test/tsconfig.json", "test/tslint.json"));
 
 gulp.task("tslint", ["tslint-src", "tslint-test"]);
 
