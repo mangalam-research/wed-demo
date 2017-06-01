@@ -73,7 +73,11 @@ export class PackDetailsComponent implements OnInit {
             return Promise.resolve(new Pack(""));
           })
           .subscribe((record) => {
-            this.file = record!;
+            if (record === undefined) {
+              throw new Error(
+                "navigating to the details of a non-existing record");
+            }
+            this.file = record;
             // We need to convert the full path back to a mode name for display.
             this.file.mode = this.modesService.pathToMode(this.file.mode);
             // We need to convert the full path back to a meta name for display.
@@ -126,7 +130,10 @@ export class PackDetailsComponent implements OnInit {
         ]);
       })
       .then(([schema, metadata]) => {
-        file.schema = schema!.chunk;
+        if (schema === undefined) {
+          throw new Error("schema is mandatory");
+        }
+        file.schema = schema.chunk;
         if (metadata !== undefined) {
           file.metadata = metadata.chunk;
         }

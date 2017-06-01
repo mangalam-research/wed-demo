@@ -145,7 +145,7 @@ describe("DBService", () => {
       }
 
       return service.loadFromFile(new File(["something"], "foo"))
-        .then((record) => check(record))
+        .then(check)
         .then(() => service.getRecordByName("foo"))
         .then((record) => check(record!));
     });
@@ -162,7 +162,7 @@ describe("DBService", () => {
       return service.updateRecord(file)
         .then(() => service.loadFromFile(new File(["something"], "newfile"),
                                          file))
-        .then((record) => check(record))
+        .then(check)
         .then(() => service.getRecordByName("foo"))
         .then((record) => check(record!));
     });
@@ -214,7 +214,7 @@ describe("DBService", () => {
       return service.updateRecord(file)
         .then(() => service.safeLoadFromFile(new File(["something"], "newfile"),
                                              file))
-        .then((record) => check(record))
+        .then((record) => check(record!))
         .then(() => service.getRecordByName("foo"))
         .then((record) => check(record!));
     });

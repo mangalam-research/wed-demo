@@ -19,7 +19,7 @@ import { ProcessingService } from "./processing.service";
 export class UploadComponent {
   constructor(private processing: ProcessingService,
               private readonly confirmService: ConfirmService,
-              @Inject("Loader") private db: Loader<{}>) {};
+              @Inject("Loader") private db: Loader<{}>) {}
 
   inputChange(ev: Event): void {
     // tslint:disable-next-line:no-floating-promises
@@ -35,6 +35,7 @@ export class UploadComponent {
         this.processing.start(filesToLoad.length);
         // tslint:disable-next-line:prefer-const
         let next: () => Promise<undefined> = () => {
+          // tslint:disable-next-line:no-non-null-assertion
           const file: File = fileArray.shift()!;
           return this.db.safeLoadFromFile(
             file,

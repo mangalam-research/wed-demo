@@ -48,7 +48,7 @@ Key extends string | number> implements Loader<Value>, Clearable {
 
   getRecords(): Promise<Value[]> {
     return this.table.toArray();
-  };
+  }
 
   deleteRecord(record: Value): Promise<void> {
     return Promise.resolve().then(() => {
@@ -62,7 +62,7 @@ Key extends string | number> implements Loader<Value>, Clearable {
       // to optimize for this. We'd have to query the table first.
       return this.table.delete(record.id).then(this.boundModified);
     });
-  };
+  }
 
   updateRecord(record: Value): Promise<Value> {
     return this.table.put(record).then((key) => {
@@ -73,7 +73,7 @@ Key extends string | number> implements Loader<Value>, Clearable {
       this.boundModified(null);
       return record;
     });
-  };
+  }
 
   getRecordById(id: number): Promise<Value | undefined> {
     return this.table.get({ id });
@@ -127,6 +127,7 @@ Key extends string | number> implements Loader<Value>, Clearable {
     }
     else {
       // confirmer cannot be undefined if we get here...
+      // tslint:disable-next-line:no-non-null-assertion
       return this.writeCheck(file.name, confirmer!)
         .then(({ write, record}): Promise<Value | undefined> | undefined => {
           if (write) {

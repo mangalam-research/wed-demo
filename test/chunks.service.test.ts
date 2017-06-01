@@ -82,7 +82,7 @@ describe("ChunksService", () => {
     it("fails, when changing a record", () =>
        service.updateRecord(file)
        .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record, file))
+       .then((record) => assertEqualChunks(record!, file))
        .then(() => {
          // tslint:disable-next-line:no-any
          (file as any).file = new File(["something else"], "a");
@@ -93,7 +93,7 @@ describe("ChunksService", () => {
     it("is a no-op on an existing, unchaged record", () =>
        service.updateRecord(file)
        .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record, file))
+       .then((record) => assertEqualChunks(record!, file))
        .then(() => expect(service.updateRecord(file))
              .to.eventually.deep.equal(file)));
 });
@@ -102,7 +102,7 @@ describe("ChunksService", () => {
     it("gets the specified record", () =>
        service.updateRecord(file)
        .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record, file)));
+       .then((record) => assertEqualChunks(record!, file)));
 
     it("gets undefined if the record does not exist", () =>
        expect(service.getRecordById("not"),
@@ -119,8 +119,7 @@ describe("ChunksService", () => {
     }
 
     it("loads into a new record", () =>
-       service.loadFromFile(new File(["something"], "foo"))
-       .then((record) => check(record)));
+       service.loadFromFile(new File(["something"], "foo")).then(check));
 
     it("loads into an existing record", () => {
       const newFile = new File(["something"], "newfile");

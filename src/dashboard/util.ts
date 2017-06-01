@@ -93,7 +93,7 @@ export function updateFormErrors(ngForm: NgForm,
     if (control != null && control.dirty && !control.valid) {
       const messages = validationMessages[field];
       for (const key in control.errors) {
-        formErrors[field] += messages[key] + " ";
+        formErrors[field] += `${messages[key]} `;
       }
     }
   }

@@ -47,7 +47,7 @@ export class DataProvider {
   private readonly cache: Record<string, string> = Object.create(null);
   private readonly parser: DOMParser = new DOMParser();
 
-  constructor(private readonly base: string) {};
+  constructor(private readonly base: string) {}
 
   getText(path: string): Promise<string> {
     return this._getText(this.base + path);

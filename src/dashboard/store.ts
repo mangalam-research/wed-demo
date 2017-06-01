@@ -103,7 +103,7 @@ export class Store extends Dexie {
     const keyType = typeof key;
 
     if (["number", "string"].indexOf(keyType) === -1) {
-      throw new Error("cannot use primary key of type: " + keyType);
+      throw new Error(`cannot use primary key of type: ${keyType}`);
     }
 
     const dbname = this.name;

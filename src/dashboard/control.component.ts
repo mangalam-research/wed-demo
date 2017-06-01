@@ -15,7 +15,7 @@ import { triggerDownload } from "./util";
 export class ControlComponent {
 
   constructor(private readonly processing: ProcessingService,
-              private readonly confirmService: ConfirmService) {};
+              private readonly confirmService: ConfirmService) {}
 
   download(): void {
     // tslint:disable-next-line:no-floating-promises

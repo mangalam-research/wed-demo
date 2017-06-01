@@ -33,6 +33,7 @@ export class Metadata extends ChunkedRecord {
     if (this.chunk !== value) {
       // Barf! This is a problem with setter/getter inheritance in
       // TypeScript.
+      // tslint:disable-next-line:no-non-null-assertion
       Object.getOwnPropertyDescriptor(ChunkedRecord.prototype, "chunk")
         .set!.call(this, value);
       this.__parsed = undefined;
@@ -47,6 +48,7 @@ export class Metadata extends ChunkedRecord {
   // This just calls up the super getter. We cannot have the setter above
   // without this getter. This is a limitation of JS. Barf barf barf!
   get chunk(): string {
+    // tslint:disable-next-line:no-non-null-assertion
     return Object.getOwnPropertyDescriptor(ChunkedRecord.prototype, "chunk")
       .get!.call(this);
   }

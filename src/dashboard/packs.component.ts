@@ -41,12 +41,18 @@ GenericRecordsComponent<Pack, PacksService> {
   }
 
   del(record: Pack): Promise<void> {
+    const id = record.id;
+
+    if (id === undefined) {
+      throw new Error("trying to delete a record with undefined id");
+    }
+
     const handleResponse = (result: boolean) => {
       if (!result) {
         return;
       }
 
-      return this.xmlFiles.getByPack(record.id!)
+      return this.xmlFiles.getByPack(id)
         .then((xmlFiles) => {
           const promises = [];
           for (const file of xmlFiles) {
@@ -62,7 +68,7 @@ GenericRecordsComponent<Pack, PacksService> {
     // Packs are special. They may be referrenced from an XML file. If that is
     // the case we cannot just delete the pack. So we check whether the pack is
     // in use. If so, we present a special confirmation prompt.
-    return this.xmlFiles.isPackUsed(record.id!)
+    return this.xmlFiles.isPackUsed(id)
       .then((used) => {
         if (used) {
           return this.confirmService.confirm(

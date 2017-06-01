@@ -21,7 +21,8 @@ class HookRecord {
               public readonly callback: MochaCallback) {}
 }
 
-interface Test<T> { // tslint:disable-line: callable-types
+interface Test<T> {
+  // tslint:disable-next-line: callable-types
   (name: string, callback?: TestCallback<T>): void;
 }
 

@@ -20,11 +20,11 @@ export class ChunksService {
 
   getRecords(): Promise<Chunk[]> {
     return this.table.toArray();
-  };
+  }
 
   deleteRecord(record: Chunk): Promise<void> {
     return this.table.delete(record.id);
-  };
+  }
 
   getRecordById(id: string): Promise<Chunk | undefined> {
     return this.table.get({ id });
@@ -46,7 +46,7 @@ export class ChunksService {
         return this.table.put(record).then(() => undefined);
       })
       .then(() => record);
-  };
+  }
 
   loadFromFile(file: File): Promise<Chunk> {
     return Chunk.makeChunk(file)
