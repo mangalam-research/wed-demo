@@ -2,10 +2,9 @@
   "compilerOptions": {
     "module": "amd",
     "moduleResolution": "node",
+    "strict": true,
     "noEmitOnError": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipDefaultLibCheck": true,
@@ -14,7 +13,6 @@
     "skipLibCheck": true,
     "outDir": "",
     "sourceMap": true,
-    "strictNullChecks": true,
     "target": "es5",
     "lib": ["dom", "es2015"]
   }

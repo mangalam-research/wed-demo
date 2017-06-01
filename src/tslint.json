@@ -1,15 +1,24 @@
 {
   "extends": "tslint-config-lddubeau",
   "rules": {
+    "no-unused-variable": [false, "We use the compiler options ",
+                           "noUnusedParameters/noUnusedLocals"],
     "missing-jsdoc": [false, "Experimental code."],
     "completed-docs": [false, "Experimental code."],
-    "promise-function-async": [false, "Need to investigate the impact of the async/await",
+    "promise-function-async": [false,
+                               "Need to investigate the impact of the async/await",
                                "conversion done by tsc."],
-    "chai-vague-errors": [false, "This rule is too generally restrictive to be left on all the time.",
-                          "It is worth turning it on from time to time and check the assertions."],
+    "chai-vague-errors": [false,
+                          "This rule is too generally restrictive to be left ",
+                          "on all the time. It is worth turning it on from ",
+                          "time to time and check the assertions."],
     "no-reference": false,
     "no-string-literal": [false,
                           "off because of ",
-                          "https://github.com/palantir/tslint/issues/1257"]
+                          "https://github.com/palantir/tslint/issues/1257"],
+    "newline-before-return": [false, "Not for this project."],
+    "no-import-side-effect": [true,
+                              { "ignore-pattern": "^(jquery|bootstrap)$" }]
+
   }
 }
