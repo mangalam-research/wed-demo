@@ -32,31 +32,7 @@ export class ControlComponent {
    * Dumps the database data to a string.
    */
   dump(): Promise<string> {
-    // tslint:disable-next-line:no-any
-    const dump: any = {
-      creationDate: new Date().toString(),
-      interchangeVersion: 1,
-      tables: {
-      },
-    };
-
-    const tableDump = dump.tables;
-    return Promise.all(db.tables.map(
-      (table) => table.toArray().then((records) => {
-        tableDump[table.name] = records;
-        if (table.name === "chunks") {
-          // The chunks table is special. Each chunk contains a file field which
-          // is a File object. However, File is not serializable. The only part
-          // of the File we use is its content, so replace the file with the
-          // string value of its content.
-          return Promise.all(records.map(
-            (record) => readFile(record.file).then((read) => {
-              record.file = read;
-            }))).then(() => undefined);
-        }
-
-        return undefined;
-      }))).then(() => JSON.stringify(dump));
+    return db.dump();
   }
 
   change(ev: Event): Promise<void> {
@@ -112,32 +88,10 @@ Do you really want to do this?`)
    * @param data A data dump.
    */
   load(data: string): Promise<void> {
-    return Promise.resolve().then(() => {
-      const dump = JSON.parse(data);
-      if (dump.interchangeVersion !== 1) {
-        throw new Error(`incorrect version number: ${dump.interchangeVersion}`);
-      }
-
-      const tableDump = dump.tables;
-      return Promise.all(db.tables.map(
-        (table) => table.clear()
-          .then(() => {
-            const records = tableDump[table.name];
-            if (records === undefined) {
-              return;
-            }
-
-            // The chunks table is special. We have to recreate a File object
-            // from the serialized data.
-            if (table.name === "chunks") {
-              for (const record of records) {
-                record.file = new File([record.file], "");
-              }
-            }
-
-            return table.bulkAdd(records);
-          })))
-        .then(() => undefined);
+    return db.load(data).then(() => {
+      // We perform an upgrade after loading the data because the data
+      // could be in a format that needs upgrading.
+      return this.upgradeService.upgrade();
     });
   }
 
