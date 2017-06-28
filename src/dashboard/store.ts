@@ -47,6 +47,16 @@ export class Store extends Dexie {
       metadata: "++id,&name",
       chunks: "++id",
     });
+    // We add recordVersion to all record types to allow for fast upgrade
+    // checks. Since a check is performed with each startup, we want it to be
+    // fast.
+    this.version(2).stores({
+      xmlfiles: "++id,&name,pack,recordVersion",
+      packs: "++id,&name,recordVersion",
+      schemas: "++id,&name,recordVersion",
+      metadata: "++id,&name,recordVersion",
+      chunks: "++id,recordVersion",
+    });
 
     this.xmlfiles.mapToClass(XMLFile);
     this.packs.mapToClass(Pack);
