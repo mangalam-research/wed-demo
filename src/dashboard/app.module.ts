@@ -20,6 +20,7 @@ import { ProcessingService } from "./processing.service";
 import { SchemaDetailsComponent } from "./schema-details.component";
 import { SchemasComponent } from "./schemas.component";
 import { SchemasService } from "./schemas.service";
+import { UpgradeService } from "./upgrade.service";
 import { UploadComponent } from "./upload.component";
 import { XMLFileDetailsComponent } from "./xml-file-details.component";
 import { XMLFilesComponent } from "./xml-files.component";
@@ -56,6 +57,7 @@ import { XMLFilesService } from "./xml-files.service";
     ModesService,
     SchemasService,
     MetadataService,
+    UpgradeService,
   ],
   bootstrap: [ AppComponent ],
 })

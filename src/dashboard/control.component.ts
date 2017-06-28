@@ -5,6 +5,7 @@ import { ConfirmService } from "./confirm.service";
 import { ProcessingService } from "./processing.service";
 import { db } from "./store";
 import { readFile } from "./store-util";
+import { UpgradeService } from "./upgrade.service";
 import { triggerDownload } from "./util";
 
 @Component({
@@ -15,6 +16,7 @@ import { triggerDownload } from "./util";
 export class ControlComponent {
 
   constructor(private readonly processing: ProcessingService,
+              private readonly upgradeService: UpgradeService,
               private readonly confirmService: ConfirmService) {}
 
   download(): void {

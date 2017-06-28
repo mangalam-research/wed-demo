@@ -19,6 +19,7 @@ import { MetadataService } from "dashboard/metadata.service";
 import { PacksService } from "dashboard/packs.service";
 import { ProcessingService } from "dashboard/processing.service";
 import { SchemasService } from "dashboard/schemas.service";
+import { UpgradeService } from "dashboard/upgrade.service";
 import { XMLFilesService } from "dashboard/xml-files.service";
 import { waitForSuccess } from "./util";
 
@@ -97,6 +98,7 @@ describe("ControlComponent", () => {
         SchemasService,
         ChunksService,
         ConfirmService,
+        UpgradeService,
       ],
     });
 
