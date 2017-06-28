@@ -13,4 +13,14 @@ describe("ModesService", () => {
     const modes = service.modes;
     expect(modes).to.have.length.above(0);
   });
+
+  it("takes a list of additional modes", () => {
+    const plain = new ModesService();
+    const plainLength = plain.modes.length;
+    const service = new ModesService([{ name: "foo", path: "foo/foo" }]);
+    const modes = service.modes;
+    expect(modes).to.have.lengthOf(plainLength + 1);
+    expect(service.modeToPath("foo")).to.equal("foo/foo");
+    expect(service.pathToMode("foo/foo")).to.equal("foo");
+  });
 });
