@@ -11,7 +11,6 @@ import { ControlComponent } from "./control.component";
 import { MetadataDetailsComponent } from "./metadata-details.component";
 import { MetadataComponent } from "./metadata.component";
 import { MetadataService } from "./metadata.service";
-import { MetasService } from "./metas.service";
 import { ModesService } from "./modes.service";
 import { PackDetailsComponent } from "./pack-details.component";
 import { PacksComponent } from "./packs.component";
@@ -54,7 +53,6 @@ import { XMLFilesService } from "./xml-files.service";
     XMLFilesService,
     PacksService,
     ProcessingService,
-    MetasService,
     ModesService,
     SchemasService,
     MetadataService,

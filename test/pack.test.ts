@@ -18,12 +18,11 @@ describe("Pack", () => {
        const payload = {
          schema: "a",
          mode: "b",
-         meta: "c",
          metadata: "d",
        };
 
        const b = new Pack("b", payload);
-       const { schema, mode, meta, metadata } = b;
-       expect({ schema, mode, meta, metadata }).to.deep.equal(payload);
+       const { schema, mode, metadata } = b;
+       expect({ schema, mode, metadata }).to.deep.equal(payload);
      });
 });

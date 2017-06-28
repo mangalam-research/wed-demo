@@ -71,7 +71,6 @@ describe("XMLFilesComponent", () => {
     schema: "aaa",
     metadata,
     mode: "generic",
-    meta: "tei",
   };
 
   // tslint:disable-next-line:mocha-no-side-effect-code

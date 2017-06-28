@@ -19,18 +19,13 @@ export interface PackPayload {
    * The name of the mode.
    */
   mode: string;
-
-  /**
-   * The name of the meta object.
-   */
-  meta?: string;
 }
 
 export class Pack extends RecordCommon implements PackPayload {
-  public schema: string;
-  public metadata?: string;
-  public mode: string;
-  public meta?: string;
+  recordVersion: number = 2;
+  schema: string;
+  metadata?: string;
+  mode: string;
 
   constructor(name: string, payload?: PackPayload) {
     super(name);
@@ -38,7 +33,6 @@ export class Pack extends RecordCommon implements PackPayload {
       this.schema =  payload.schema;
       this.metadata = payload.metadata;
       this.mode = payload.mode;
-      this.meta = payload.meta;
     }
   }
 
@@ -57,6 +51,5 @@ export class Pack extends RecordCommon implements PackPayload {
     into.schema = this.schema;
     into.metadata = this.metadata;
     into.mode = this.mode;
-    into.meta = this.meta;
   }
 }

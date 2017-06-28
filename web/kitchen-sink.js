@@ -191,22 +191,12 @@ define(function f(require) {
             options.mode = {
               path: pack.mode,
               options: {
-                meta: undefined,
               },
             };
 
-            if (pack.meta) {
-              var modeOptions = options.mode.options;
-              modeOptions.meta = {
-                path: pack.meta,
-                options: {
-                  metadata: undefined,
-                },
-              };
-
-              if (metadataURL) {
-                modeOptions.meta.options.metadata = metadataURL;
-              }
+            var modeOptions = options.mode.options;
+            if (metadataURL) {
+              modeOptions.metadata = metadataURL;
             }
           }),
         ]);

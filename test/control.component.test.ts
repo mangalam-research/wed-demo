@@ -175,7 +175,6 @@ describe("ControlComponent", () => {
                                   .then((record) => {
                                     expect(record!.name).to.equal("foo");
                                     expect(record!.mode).to.equal("generic");
-                                    expect(record!.meta).to.equal("tei");
                                     const schema = record!.schema;
                                     return chunksService.getRecordById(schema)
                                       .then((chunk) =>

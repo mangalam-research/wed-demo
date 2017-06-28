@@ -6,7 +6,6 @@ import { Subscription } from "rxjs";
 
 import { MetadataService,
          NameIdArray as MetadataInfoArray } from "./metadata.service";
-import { MetasService } from "./metas.service";
 import { ModesService } from "./modes.service";
 import { Pack } from "./pack";
 import { PacksService } from "./packs.service";
@@ -42,20 +41,17 @@ export class PackDetailsComponent implements OnInit {
   file: Pack;
   modes: string[];
   schemas: SchemaInfoArray;
-  metas: string[];
   metadata: MetadataInfoArray;
 
   constructor(private readonly files: PacksService,
               private readonly modesService: ModesService,
               private readonly schemasService: SchemasService,
-              private readonly metasService: MetasService,
               private readonly metadataService: MetadataService,
               private readonly route: ActivatedRoute,
               private readonly location: Location) {}
 
   ngOnInit(): void {
     this.modes = this.modesService.modes;
-    this.metas = this.metasService.metas;
     // tslint:disable-next-line:no-floating-promises
     Promise.all(
       [this.schemasService.getNameIdArray().then(
@@ -80,8 +76,6 @@ export class PackDetailsComponent implements OnInit {
             this.file = record;
             // We need to convert the full path back to a mode name for display.
             this.file.mode = this.modesService.pathToMode(this.file.mode);
-            // We need to convert the full path back to a meta name for display.
-            this.file.meta = this.metasService.pathToMeta(this.file.meta);
           });
       });
   }
@@ -142,8 +136,6 @@ export class PackDetailsComponent implements OnInit {
         // We need to record the full path in the pack.
         file.mode = this.modesService.modeToPath(file.mode);
 
-        // We need to record the full path in the pack.
-        file.meta = this.metasService.metaToPath(file.meta);
         return this.files.updateRecord(file);
       });
   }

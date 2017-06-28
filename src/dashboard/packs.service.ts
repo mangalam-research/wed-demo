@@ -44,7 +44,6 @@ export class PacksService extends DBService<Pack, number> {
       .then(([schema, metadata]: [Chunk, Chunk | undefined]) => {
         const payload: PackPayload = {
           mode: obj.mode,
-          meta: obj.meta,
           schema: schema.id,
           metadata: metadata === undefined ? undefined : metadata.id,
         };
@@ -75,7 +74,6 @@ export class PacksService extends DBService<Pack, number> {
           name: record.name,
           schema,
           mode: record.mode,
-          meta: record.meta,
           metadata,
         });
       });
