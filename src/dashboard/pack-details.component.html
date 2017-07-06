@@ -34,6 +34,25 @@
        {{ formErrors.metadata }}
     </div>
 
+    <p>
+      Setting the following fields overrides any automatic matching that
+      this application performs by default.
+    </p>
+
+    <label for="matchLocalName">Match local name: </label>
+    <input name="matchLocalName" class="form-control" [(ngModel)]="file.match.localName"
+           placeholder="local name">
+    <div *ngIf="formErrors.matchLocalName" class="alert alert-danger">
+       {{ formErrors.matchLocalName }}
+    </div>
+
+    <label for="matchNamespaceURI">Match namespace URI: </label>
+    <input name="matchNamespaceURI" class="form-control" [(ngModel)]="file.match.namespaceURI"
+           placeholder="URI">
+    <div *ngIf="formErrors.matchNamespaceURI" class="alert alert-danger">
+       {{ formErrors.matchNamespaceURI }}
+    </div>
+
     <hr>
     <label for="uploaded">Last uploaded: </label>
     <input name="uploaded" class="form-control"

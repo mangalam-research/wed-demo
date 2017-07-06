@@ -147,7 +147,31 @@ Key extends string | number> implements Loader<Value>, Clearable {
     return Promise.resolve(this.table.clear().then(this.boundModified));
   }
 
+  /**
+   * Make a new record. This record is *not* saved in the database by this
+   * method.
+   *
+   * @param name The name of the record.
+   *
+   * @param data The data making up the record.
+   *
+   * @returns A promise resolving to the new record.
+   */
   abstract makeRecord(name: string, data: string): Promise<Value>;
+
+  /**
+   * Make a new record and immediately save it to the database.
+   *
+   * @param name The name of the record.
+   *
+   * @param data The data making up the record.
+   *
+   * @returns A promise resolving to the saved record.
+   */
+  saveNewRecord(name: string, data: string): Promise<Value> {
+    return this.makeRecord(name, data)
+      .then((record) => this.updateRecord(record));
+  }
 
   abstract getDownloadData(record: Value): Promise<string>;
 

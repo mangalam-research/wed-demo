@@ -4,6 +4,7 @@
     "no-unused-expression": [false, "Chai's expect raises a lot of false ",
                              "positives."],
     "no-non-null-assertion": [false, "A wrongly used assertion will cause a ",
-                              "crash and the test to fail."]
+                              "crash and the test to fail."],
+    "await-promise": [true, "Thenable"]
   }
 }

@@ -58,7 +58,7 @@ describe("GenericRecordsComponent", () => {
   let fakeConfirmer: sinon.SinonStub;
   let records: XMLFile[];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.sandbox.create();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
@@ -74,25 +74,25 @@ describe("GenericRecordsComponent", () => {
         { provide: Router, useClass: RouterStub }],
     });
 
-    return TestBed.compileComponents()
-      .then(() => {
-        recordsService = TestBed.get(XMLFilesService);
-        return Promise.all(
-          [{name: "a", data: "foo"},
-           {name: "b", data: "foo b"}]
-            .map((x) => recordsService.makeRecord(x.name, x.data)
-                 .then((record) => recordsService.updateRecord(record))))
-          .then((newRecords) => records = newRecords);
-      })
-      .then(() => {
-        fixture = TestBed.createComponent(XMLFilesComponent);
-        component = fixture.componentInstance;
-        de = fixture.debugElement.query(By.css("div"));
-        el = de.nativeElement;
-      })
+    await TestBed.compileComponents();
+    recordsService = TestBed.get(XMLFilesService);
+    records = await Promise.all(
+      [{name: "a", data: "foo"},
+       {name: "b", data: "foo b"}]
+        .map(async (x) => {
+          const record = await recordsService.makeRecord(x.name, x.data);
+          return recordsService.updateRecord(record);
+        }));
+
+    fixture = TestBed.createComponent(XMLFilesComponent);
+    component = fixture.componentInstance;
+    de = fixture.debugElement.query(By.css("div"));
+    el = de.nativeElement;
+
     // Wait until the component has refreshed.
-      .then(() => waitFor(() => component.records != null &&
-                          component.records.length !== 0));
+    await waitFor(() => component.records != null &&
+                  component.records.length !== 0);
+    return fixture.whenStable();
   });
 
   afterEach(() => db.delete().then(() => db.open()));

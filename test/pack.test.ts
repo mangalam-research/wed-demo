@@ -4,7 +4,7 @@ import "mocha";
 
 const expect = chai.expect;
 
-import { Pack } from "dashboard/pack";
+import { Pack, PackPayload } from "dashboard/pack";
 
 describe("Pack", () => {
   // tslint:disable-next-line:mocha-no-side-effect-code
@@ -15,14 +15,19 @@ describe("Pack", () => {
 
   it("takes a payload",
      () => {
-       const payload = {
+       const payload: PackPayload = {
          schema: "a",
          mode: "b",
          metadata: "d",
+         match: {
+           method: "top-element",
+           localName: "",
+           namespaceURI: "",
+         },
        };
 
        const b = new Pack("b", payload);
-       const { schema, mode, metadata } = b;
-       expect({ schema, mode, metadata }).to.deep.equal(payload);
+       const { schema, mode, metadata, match } = b;
+       expect({ schema, mode, metadata, match }).to.deep.equal(payload);
      });
 });

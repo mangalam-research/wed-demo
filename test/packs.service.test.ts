@@ -11,10 +11,15 @@ import { ChunksService } from "dashboard/chunks.service";
 import { Pack } from "dashboard/pack";
 import { PacksService } from "dashboard/packs.service";
 
+import { DataProvider } from "./util";
+
 describe("PacksService", () => {
   let chunkService: ChunksService;
   let service: PacksService;
-  let file: Pack;
+  // tslint:disable-next-line:mocha-no-side-effect-code
+  const files: Record<string, Pack> = Object.create(null);
+  let schema: string;
+  let provider: DataProvider;
 
   // tslint:disable-next-line:mocha-no-side-effect-code
   const metadata = JSON.stringify({
@@ -27,36 +32,71 @@ describe("PacksService", () => {
     },
   });
 
-  const packAUnserialized = {
-    name: "foo",
-    interchangeVersion: 1,
-    schema: "aaa",
-    metadata,
-    mode: "generic",
-  };
-
-  // tslint:disable-next-line:mocha-no-side-effect-code
-  const packA = JSON.stringify(packAUnserialized);
-
-  before(() => {
+  before(async () => {
     chunkService = new ChunksService();
     service = new PacksService(chunkService);
-    return service.makeRecord("foo", packA)
-      .then((newFile) => file = newFile)
-      .then(() => service.updateRecord(file));
+    provider = new DataProvider("/base/test/data/");
+    schema = await provider.getText("doc-annotated.js");
+    const packsUnserialized = [{
+      name: "foo",
+      interchangeVersion: 1,
+      schema,
+      metadata,
+      mode: "generic",
+      match: {
+        method: "top-element",
+        localName: "",
+        namespaceURI: "",
+      },
+    }, {
+      name: "moo",
+      interchangeVersion: 1,
+      schema,
+      metadata,
+      mode: "generic",
+      match: {
+        method: "top-element",
+        localName: "moo",
+        namespaceURI: "moouri",
+      },
+    }];
+
+    for (const packUnserialized of packsUnserialized) {
+      const packData = JSON.stringify(packUnserialized);
+      const pack = await service.saveNewRecord("foo", packData);
+      files[pack.name] = pack;
+    }
   });
 
   after(() => db.delete().then(() => db.open()));
 
-  describe("makeRecord", () => {
+  describe("#makeRecord", () => {
     it("records metadata into a chunk", () =>
-       expect(chunkService.getRecordById(file.metadata!)
+       expect(chunkService.getRecordById(files["foo"].metadata!)
               .then((chunk) => chunk!.getData()))
        .to.eventually.equal(metadata));
 
     it("records schema into a chunk", () =>
-       expect(chunkService.getRecordById(file.schema)
-              .then((chunk) => chunk!.getData())).to.eventually.equal("aaa"));
+       expect(chunkService.getRecordById(files["foo"].schema)
+              .then((chunk) => chunk!.getData())).to.eventually.equal(schema));
+  });
+
+  describe("#matchWithPack", () => {
+    it("returns undefined if nothing matches", async () => {
+      await expect(service.matchWithPack("moo", "")).to.eventually.be.undefined;
+      await expect(service.matchWithPack("b", "moouri"))
+        .to.eventually.be.undefined;
+    });
+
+    it("matches automatically if there is no explicit match set", () =>
+       expect(service.matchWithPack("doc",
+                                    // tslint:disable-next-line:no-http-string
+                                    "http://mangalamresearch.org/ns/mmwp/doc"))
+       .to.eventually.have.property("id").equal(files["foo"].id));
+
+    it("matches automatically if there is an explicit match set", () =>
+       expect(service.matchWithPack("moo", "moouri"))
+       .to.eventually.have.property("id").equal(files["moo"].id));
   });
 
   describe("#getDownloadData", () => {
@@ -68,6 +108,11 @@ describe("PacksService", () => {
         schema: "aaa",
         metadata,
         mode: "generic",
+        match: {
+           method: "top-element",
+           localName: "foo",
+           namespaceURI: "bar",
+        },
       },
       minimal: {
         name: "minimal",
@@ -75,6 +120,11 @@ describe("PacksService", () => {
         schema: "aaa",
         metadata: undefined,
         mode: "generic",
+        match: {
+           method: "top-element",
+           localName: "",
+           namespaceURI: "",
+        },
       },
     };
 

@@ -7,6 +7,7 @@
 "use strict";
 
 import { Injectable } from "@angular/core";
+import { BaseName, constructTree, Event } from "salve";
 
 import { Chunk } from "./chunk";
 import { ChunksService } from "./chunks.service";
@@ -16,10 +17,91 @@ import { db } from "./store";
 
 export type NameIdArray = NIA<number>;
 
+type MatchingData = Record<string, number>;
+
+function makeMatchKey(localName: string, namespaceURI: string): string {
+  return `{${namespaceURI}}${localName}`;
+}
+
+function addToMatchingData(data: MatchingData, key: string, id: number): void {
+  // If they key is already in our map, we privilege the packs with
+  // newer ids.
+  if (!(key in data) || (data[key] < id)) {
+    data[key] = id;
+  }
+}
+
 @Injectable()
 export class PacksService extends DBService<Pack, number> {
+  private _matchingData?: MatchingData;
   constructor(private readonly chunksService: ChunksService) {
     super(db.packs);
+    this.change.subscribe(this.clearMatchingData);
+  }
+
+  private clearMatchingData(): void {
+    this._matchingData = undefined;
+  }
+
+  private async getMatchingData(): Promise<MatchingData> {
+    if (this._matchingData === undefined) {
+      const packs = await this.getRecords();
+      const data: MatchingData = Object.create(null);
+      for (const pack of packs) {
+        const schemaID = pack.schema;
+        // tslint:disable-next-line:no-non-null-assertion
+        const id = pack.id!;
+        const { localName, namespaceURI } = pack.match;
+        if (localName === "") {
+          const schemaChunk =
+            // tslint:disable-next-line:no-non-null-assertion
+            (await this.chunksService.getRecordById(schemaID))!;
+          const schema = await schemaChunk.getData();
+          const grammar = constructTree(schema);
+          const walker = grammar.newWalker();
+          const possible: Event[] = walker.possible().toArray();
+          for (const event of possible) {
+            if (event.params[0] === "enterStartTag") {
+              const name = event.params[1] as BaseName;
+
+              // We only work with simple patterns that match exactly one name.
+              const names = name.toArray();
+              if (names !== null && names.length === 1) {
+                const key = makeMatchKey(names[0].name, names[0].ns);
+                addToMatchingData(data, key, id);
+              }
+            }
+          }
+        }
+        else {
+          const key = makeMatchKey(localName, namespaceURI);
+          addToMatchingData(data, key, id);
+        }
+      }
+
+      this._matchingData = data;
+    }
+
+    return this._matchingData;
+  }
+
+  /**
+   * Match an element's local name and namespace URI with a pack.
+   *
+   * @param localName The local name of the element.
+   *
+   * @param namespaceURI The URI of the namespace of the element.
+   *
+   * @returns The pack, if one matches.
+   */
+  async matchWithPack(localName: string,
+                      namespaceURI: string): Promise<Pack | undefined> {
+    const key = makeMatchKey(localName, namespaceURI);
+    const id = (await this.getMatchingData())[key];
+    if (id === undefined) {
+      return undefined;
+    }
+    return this.getRecordById(id);
   }
 
   /**
@@ -46,6 +128,7 @@ export class PacksService extends DBService<Pack, number> {
           mode: obj.mode,
           schema: schema.id,
           metadata: metadata === undefined ? undefined : metadata.id,
+          match: obj.match,
         };
         return new Pack(obj.name, payload);
       });
@@ -75,7 +158,12 @@ export class PacksService extends DBService<Pack, number> {
           schema,
           mode: record.mode,
           metadata,
+          match: record.match,
         });
       });
+  }
+
+  makeIndexedDBURL(file: Pack, property?: string): string {
+    return db.makeIndexedDBURL(db.packs, file, property);
   }
 }

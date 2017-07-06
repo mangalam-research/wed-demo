@@ -19,9 +19,9 @@
       <tr *ngFor="let record of records; let $last = last; trackBy: record?.name" [class.last]="$last" [attr.data-record-name]="record.name" (click)="showDetails(record, $event)">
         <td class="buttons">
           <button class="btn btn-default edit-button"
-             [attr.disabled]="record.pack ? null : ''"
+             [attr.disabled]="getEditingData(record).editingDisabled() | async"
              (click)="edit(record)"
-             [attr.title]="editButtonTitle(record)">
+             [attr.title]="getEditingData(record).editButtonTitle() | async">
             <i class="fa fa-edit"></i>
           </button>
           <button class="btn btn-default delete-button"
