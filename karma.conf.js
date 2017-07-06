@@ -70,7 +70,7 @@ module.exports = function configure(config) {
       "web/system.config.js",
       "test/karma-main.js",
       { pattern: "test/**/*.ts", included: false },
-      { pattern: "test/data/*.json", included: false },
+      { pattern: "test/data/**", included: false },
       { pattern: "build/**/*.@(js|html|map|css)", included: false },
     ].reduce((acc, x) => acc.concat(x), []),
     exclude: [],

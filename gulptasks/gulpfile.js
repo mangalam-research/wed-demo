@@ -167,7 +167,8 @@ gulp.task("tslint", ["tslint-src", "tslint-test"]);
 
 gulp.task("eslint", () =>
           gulp.src(["lib/**/*.js", "*.js", "bin/**", "config/**/*.js",
-                    "gulptasks/**/*.js", "misc/**/*.js", "test/**/*.js"])
+                    "gulptasks/**/*.js", "misc/**/*.js", "test/**/*.js",
+                    "!test/data/**"])
           .pipe(eslint())
           .pipe(eslint.format())
           .pipe(eslint.failAfterError()));

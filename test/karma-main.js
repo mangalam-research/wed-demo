@@ -8,7 +8,7 @@
   window.__karma__.loaded = function loaded() {};
 
   var allTestFiles = [];
-  var TEST_REGEXP = /test\/(?!karma-main).*\.js$/i;
+  var TEST_REGEXP = /test\/(?!karma-main|data\/).*\.js$/i;
 
   Object.keys(window.__karma__.files).forEach(function forEach(file) {
     if (TEST_REGEXP.test(file)) {
