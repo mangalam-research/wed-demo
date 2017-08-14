@@ -85,7 +85,7 @@
     "karma-coverage": "^1.1.1",
     "karma-mocha": "^1.3.0",
     "karma-remap-coverage": "^0.1.4",
-    "karma-typescript-preprocessor2": "https://registry.npmjs.org/karma-typescript-preprocessor2/-/karma-typescript-preprocessor2-1.2.1.tgz",
+    "karma-typescript-agile-preprocessor": "^2.0.0",
     "lite-server": "^2.3.0",
     "mocha": "^3.2.0",
     "raw-loader": "^0.5.1",
