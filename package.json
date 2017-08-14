@@ -52,7 +52,7 @@
     "systemjs": "^0.20.15",
     "systemjs-plugin-json": "^0.3.0",
     "urijs": ">=1.16.1 <2",
-    "wed": "0.28.2",
+    "wed": "0.29.0",
     "zone.js": "^0.8.10"
   },
   "devDependencies": {
