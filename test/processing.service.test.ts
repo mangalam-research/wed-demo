@@ -69,17 +69,15 @@ describe("ProcessingService", () => {
       service.start(total);
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
-      function test(index: number): Promise<void> {
+      async function test(index: number): Promise<void> {
         const p = service.state.elementAt(1).toPromise();
         service.increment();
-        return expect(p).to.eventually.deep.equal({ total, count: index })
-          .then(() => {
-            if (index < total) {
-              return test(index + 1);
-            }
+        expect(await p).to.deep.equal({ total, count: index });
+        if (index < total) {
+          return test(index + 1);
+        }
 
-            return undefined;
-          }) as Promise<void>;
+        return undefined;
       }
 
       return test(1);

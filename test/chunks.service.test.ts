@@ -128,10 +128,10 @@ describe("ChunksService", () => {
               Promise.all([
                 check(record),
                 expect(service.recordCount).to.eventually.equal(1)
-                  .then(() => service.loadFromFile(newFile))
-                  .then((otherRecord) => {
+                  .then(async () => {
+                    const otherRecord = await service.loadFromFile(newFile);
                     expect(otherRecord.id).to.equal(record.id);
-                    return expect(service.recordCount).to.eventually.equal(1);
+                    return expect(await service.recordCount).to.equal(1);
                   }),
               ]));
     });

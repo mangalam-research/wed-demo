@@ -26,7 +26,7 @@ export class UploadComponent {
     this.change(ev);
   }
 
-  change(ev: Event): Promise<undefined> {
+  change(ev: Event): Promise<void> {
     return Promise.resolve().then(() => {
       const target = (ev.target as HTMLInputElement);
       const filesToLoad = target.files;
@@ -34,7 +34,7 @@ export class UploadComponent {
         const fileArray = Array.from(filesToLoad);
         this.processing.start(filesToLoad.length);
         // tslint:disable-next-line:prefer-const
-        let next: () => Promise<undefined> = () => {
+        let next: () => Promise<void> = () => {
           // tslint:disable-next-line:no-non-null-assertion
           const file: File = fileArray.shift()!;
           return this.db.safeLoadFromFile(

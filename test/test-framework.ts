@@ -103,8 +103,8 @@ export class TestSuite<T> {
           }
         }
         else if (item instanceof HookRecord) {
-          const wrapper = function wrapper(this: Mocha.IHookCallbackContext,
-                                           ...args: any[]): any {
+          const wrapper = function _wrapper(this: Mocha.IHookCallbackContext,
+                                            ...args: any[]): any {
             return item.callback.apply(undefined, [{
               test: this,
               state,

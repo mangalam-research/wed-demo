@@ -1,6 +1,8 @@
 import { ajax } from "bluejax";
 import "chai";
 
+const expect = chai.expect;
+
 export function waitFor(fn: () => boolean | Promise<boolean>,
                         delay: number = 100,
                         timeout?: number):
@@ -73,4 +75,39 @@ export class DataProvider {
       return this.parser.parseFromString(data, "text/xml");
     });
   }
+}
+
+// tslint:disable-next-line:no-any
+export type ErrorClass = { new (...args: any[]): Error };
+
+// tslint:disable-next-line:no-any
+export function expectReject(p: Promise<any>,
+                             pattern: RegExp | string): Promise<void>;
+// tslint:disable-next-line:no-any
+export function expectReject(p: Promise<any>, errorClass: ErrorClass,
+                             pattern: RegExp | string): Promise<void>;
+// tslint:disable-next-line:no-any
+export function expectReject(p: Promise<any>,
+                             errorLike: RegExp | string | ErrorClass,
+                             pattern?: RegExp | string): Promise<void> {
+  return p.then(
+    () => {
+      throw new Error("should have thrown an error");
+    },
+    // tslint:disable-next-line:no-any
+    (ex: any) => {
+      if (!(errorLike instanceof RegExp || typeof errorLike === "string")) {
+        expect(ex).to.be.instanceof(errorLike);
+      }
+      else {
+        pattern = errorLike;
+      }
+
+      if (pattern instanceof RegExp) {
+        expect(ex).to.have.property("message").match(pattern);
+      }
+      else {
+        expect(ex).to.have.property("message").equal(pattern);
+      }
+    });
 }

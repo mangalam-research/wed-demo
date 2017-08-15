@@ -29,7 +29,7 @@ import { XMLFilesService } from "dashboard/xml-files.service";
 
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";
-import { DataProvider, waitFor, waitForSuccess } from "./util";
+import { DataProvider, expectReject, waitFor, waitForSuccess } from "./util";
 
 // tslint:disable: no-empty
 class RouterStub {
@@ -172,8 +172,8 @@ describe("XMLFilesComponent", () => {
 
     it("fails if the file has no pack associated with it", async () => {
       const record = await recordsService.getRecordByName("b");
-      await expect(component.edit(record!)).to.be.rejectedWith(
-        Error, /^edit launched on file without a pack/);
+      await expectReject(component.edit(record!), Error,
+                         /^edit launched on file without a pack/);
       expect(goToStub.callCount).to.equal(0);
     });
 
@@ -181,8 +181,8 @@ describe("XMLFilesComponent", () => {
       const stub = sandbox.stub(packsService, "getRecordById");
       stub.returns(Promise.resolve(undefined));
       component.records[0].pack = -999;
-      await expect(component.edit(component.records[0])).to.be.rejectedWith(
-        Error, /cannot load pack: -999/);
+      await expectReject(component.edit(component.records[0]),
+                         Error, /cannot load pack: -999/);
       expect(goToStub.callCount).to.equal(0);
     });
 

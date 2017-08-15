@@ -7,7 +7,7 @@
 "use strict";
 
 import Dexie from "dexie"; // tslint:disable-line:import-name
-import { Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 
 import { readFile } from "./store-util";
 
@@ -35,14 +35,18 @@ export type NameIdArray<Key> = {name: string, id: Key}[];
 export abstract class DBService<Value extends IValue<Key>,
 Key extends string | number> implements Loader<Value>, Clearable {
   private readonly boundModified: <R>(arg: R) => R;
-  public readonly change: Subject<void> = new Subject<void>();
+  private readonly _change: Subject<void>;
+  public readonly change: Observable<void>;
 
   constructor(protected readonly table: Dexie.Table<Value, Key>) {
     this.boundModified = this.modified.bind(this);
+    this._change = new Subject();
+    this.change = this._change.asObservable();
+
   }
 
   private modified<R>(arg?: R): R | undefined{
-    this.change.next();
+    this._change.next();
     return arg;
   }
 
@@ -178,8 +182,11 @@ Key extends string | number> implements Loader<Value>, Clearable {
   getNameIdArray(): Promise<NameIdArray<Key>> {
     return this.getRecords()
       .then((records) =>
-            records.map((record: Value) => ({ name: record.name,
-                                              id: record.id })));
+            records.map((record: Value) => ({
+              name: record.name,
+              // tslint:disable-next-line:no-non-null-assertion
+              id: record.id!,
+            })));
   }
 
   getRecordCount(): Promise<number> {

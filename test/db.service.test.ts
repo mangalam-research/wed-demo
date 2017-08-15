@@ -249,15 +249,20 @@ describe("DBService", () => {
       // going to set the file to.
       return expect(file.getData()).to.eventually.not.be.equal("something")
         .then(() => service.updateRecord(file))
-        .then(() => service.safeLoadFromFile(new File(["something"],
-                                                      file.name),
-                                             () => {
-                                               asked = true;
-                                               return Promise.resolve(true);
-                                             }))
-        .then((record) => check(record!))
-        .then(() => service.getRecordByName(file.name))
-        .then((record) => check(record!))
+        .then(async () => {
+          const record = await service.safeLoadFromFile
+          (new File(["something"],
+                    file.name),
+           () => {
+             asked = true;
+             return Promise.resolve(true);
+           });
+          return check(record!);
+        })
+        .then(async () => {
+          const record = await service.getRecordByName(file.name);
+          return check(record!);
+        })
         .then(() => expect(service.getRecordCount()).to.eventually.equal(1))
         .then(() => expect(asked, "should have asked").to.be.true);
     });
@@ -284,8 +289,7 @@ describe("DBService", () => {
                                              }))
         .then((record) =>
               expect(record, "should not have found a record").to.be.undefined)
-        .then(() => service.getRecordByName(file.name))
-        .then((record) => check(record!))
+        .then(async () => check((await service.getRecordByName(file.name))!))
         .then(() => expect(service.getRecordCount()).to.eventually.equal(1))
         .then(() => expect(asked, "should have asked").to.be.true);
     });

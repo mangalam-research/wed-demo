@@ -83,9 +83,8 @@ describe("PacksService", () => {
 
   describe("#matchWithPack", () => {
     it("returns undefined if nothing matches", async () => {
-      await expect(service.matchWithPack("moo", "")).to.eventually.be.undefined;
-      await expect(service.matchWithPack("b", "moouri"))
-        .to.eventually.be.undefined;
+      expect(await service.matchWithPack("moo", "")).to.be.undefined;
+      expect(await service.matchWithPack("b", "moouri")).to.be.undefined;
     });
 
     it("matches automatically if there is no explicit match set", () =>
