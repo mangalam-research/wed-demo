@@ -161,7 +161,8 @@ Key extends string | number> implements Loader<Value>, Clearable {
    *
    * @returns A promise resolving to the new record.
    */
-  abstract makeRecord(name: string, data: string): Promise<Value>;
+  abstract makeRecord(name: string, data: string | Promise<string>):
+  Promise<Value>;
 
   /**
    * Make a new record and immediately save it to the database.

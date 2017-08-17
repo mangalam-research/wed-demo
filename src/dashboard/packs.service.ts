@@ -107,9 +107,11 @@ export class PacksService extends DBService<Pack, number> {
   /**
    * The string passed must be in the interchange format for packs.
    */
-  makeRecord(_name: string, data: string): Promise<Pack> {
+  async makeRecord(_name: string,
+                   data: string | Promise<string>): Promise<Pack> {
     // We do not use the _name parameter as the name of packs is stored in the
     // pack.
+    data = await data;
     const obj = JSON.parse(data);
     if (obj.interchangeVersion !== 1) {
       throw new Error(`unknown interchangeVersion: ${obj.interchangeVersion}`);
@@ -121,17 +123,17 @@ export class PacksService extends DBService<Pack, number> {
       Promise.resolve(undefined) :
       this.chunksService.createRecord(obj.metadata);
 
-    return Promise.all([this.chunksService.createRecord(obj.schema),
-                        metadataRecord])
-      .then(([schema, metadata]: [Chunk, Chunk | undefined]) => {
-        const payload: PackPayload = {
-          mode: obj.mode,
-          schema: schema.id,
-          metadata: metadata === undefined ? undefined : metadata.id,
-          match: obj.match,
-        };
-        return new Pack(obj.name, payload);
-      });
+    const [schema, metadata] =
+      await Promise.all([this.chunksService.createRecord(obj.schema),
+                         metadataRecord]) as [Chunk, Chunk | undefined];
+    const payload: PackPayload = {
+      mode: obj.mode,
+      schema: schema.id,
+      metadata: metadata === undefined ? undefined : metadata.id,
+      match: obj.match,
+    };
+
+    return new Pack(obj.name, payload);
   }
 
   getDownloadData(record: Pack): Promise<string> {

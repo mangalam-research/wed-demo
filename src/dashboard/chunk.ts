@@ -10,13 +10,17 @@ export class Chunk {
   // tslint:disable-next-line:variable-name
   private __data: Promise<string>;
 
-  static makeChunk(file: File | string): Promise<Chunk> {
+  static async makeChunk(file: File | string | Promise<File | string>):
+  Promise<Chunk> {
+
+    file = await file;
+
     if (typeof file === "string") {
-      return Promise.resolve(new Chunk(md5(file), new File([file], ""), file));
+      return new Chunk(md5(file), new File([file], ""), file);
     }
 
-    return readFile(file)
-      .then((data) => new Chunk(md5(data), file, data));
+    const data = await readFile(file);
+    return new Chunk(md5(data), file, data);
   }
 
   private constructor(id: string, file: File, data: string) {

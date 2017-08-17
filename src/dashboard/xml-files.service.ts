@@ -19,10 +19,10 @@ export class XMLFilesService extends DBService<XMLFile, number> {
     super(db.xmlfiles);
   }
 
-  makeRecord(name: string, data: string): Promise<XMLFile> {
-    return Chunk.makeChunk(data)
-      .then((chunk) => this.chunksService.updateRecord(chunk))
-      .then((chunk) => new XMLFile(name, chunk));
+  async makeRecord(name: string,
+                   data: string | Promise<string>): Promise<XMLFile> {
+    const chunk = await Chunk.makeChunk(data);
+    return new XMLFile(name, await this.chunksService.updateRecord(chunk));
   }
 
   getDownloadData(record: XMLFile): Promise<string> {

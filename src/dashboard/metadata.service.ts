@@ -22,10 +22,10 @@ export class MetadataService extends DBService<Metadata, number> {
     super(db.metadata);
   }
 
-  makeRecord(name: string, data: string): Promise<Metadata> {
-    return Chunk.makeChunk(data)
-      .then((chunk) => this.chunksService.updateRecord(chunk))
-      .then((chunk) => new Metadata(name, chunk));
+  async makeRecord(name: string,
+                   data: string | Promise<string>): Promise<Metadata> {
+    const chunk = await Chunk.makeChunk(data);
+    return new Metadata(name, await this.chunksService.updateRecord(chunk));
   }
 
   getDownloadData(record: Metadata): Promise<string> {

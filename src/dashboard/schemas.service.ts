@@ -22,10 +22,10 @@ export class SchemasService extends DBService<Schema, number> {
     super(db.schemas);
   }
 
-  makeRecord(name: string, data: string): Promise<Schema> {
-    return Chunk.makeChunk(data)
-      .then((chunk) => this.chunksService.updateRecord(chunk))
-      .then((chunk) => new Schema(name, chunk));
+  async makeRecord(name: string,
+                   data: string | Promise<string>): Promise<Schema> {
+    const chunk = await Chunk.makeChunk(data);
+    return new Schema(name, await this.chunksService.updateRecord(chunk));
   }
 
   getDownloadData(record: Schema): Promise<string> {
