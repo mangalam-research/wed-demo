@@ -153,8 +153,8 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
     super(router, files, processing, confirmService, XML_FILES);
   }
 
-  ngAfterViewInit(): void {
-    super.ngAfterViewInit();
+  ngOnInit(): void {
+    super.ngOnInit();
 
     // We also want to clear our editing data and refresh when packs are
     // modified, deleted or added.

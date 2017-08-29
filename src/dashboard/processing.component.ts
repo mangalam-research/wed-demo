@@ -17,7 +17,7 @@ export class ProcessingComponent {
 
   constructor(private service: ProcessingService) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     const element = this.modalRef.nativeElement;
     this.$modal = $(element);
     this.progress = element.getElementsByClassName("bar")[0] as HTMLElement;

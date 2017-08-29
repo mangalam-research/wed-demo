@@ -16,7 +16,7 @@ RecordService extends DBService<RecordType, number>> {
               protected readonly confirmService: ConfirmService,
               protected readonly detailRoutePrefix: string) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.files.change.subscribe(() => {
       this.refresh();
     });
