@@ -26,8 +26,7 @@ import { XMLFileDetailsComponent } from "./xml-file-details.component";
 import { XMLFilesComponent } from "./xml-files.component";
 import { XMLFilesService } from "./xml-files.service";
 
-//tslint:disable-next-line:no-stateless-class
-@NgModule({
+export const configuration: NgModule = {
   imports: [
     BrowserModule,
     FormsModule,
@@ -60,5 +59,8 @@ import { XMLFilesService } from "./xml-files.service";
     UpgradeService,
   ],
   bootstrap: [ AppComponent ],
-})
+};
+
+//tslint:disable-next-line:no-stateless-class
+@NgModule(configuration)
 export class AppModule { }
