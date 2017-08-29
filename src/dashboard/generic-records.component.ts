@@ -1,4 +1,5 @@
 import { Router } from "@angular/router";
+import { Subscription } from "rxjs";
 
 import { ConfirmService } from "./confirm.service";
 import { DBService } from "./db.service";
@@ -9,6 +10,7 @@ import { triggerDownload } from "./util";
 export abstract class GenericRecordsComponent<RecordType extends RecordCommon,
 RecordService extends DBService<RecordType, number>> {
   records: RecordType[];
+  changeSub: Subscription;
 
   constructor(protected readonly router: Router,
               protected readonly files: RecordService,
@@ -17,10 +19,14 @@ RecordService extends DBService<RecordType, number>> {
               protected readonly detailRoutePrefix: string) {}
 
   ngOnInit(): void {
-    this.files.change.subscribe(() => {
+    this.changeSub = this.files.change.subscribe(() => {
       this.refresh();
     });
     this.refresh();
+  }
+
+  ngOnDestroy(): void {
+    this.changeSub.unsubscribe();
   }
 
   protected refresh(): void {

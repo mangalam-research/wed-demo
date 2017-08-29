@@ -7,6 +7,7 @@
 
 import { Component, Inject, Optional } from "@angular/core";
 import { Router } from "@angular/router";
+import { Subscription } from "rxjs";
 
 import { ConfirmService } from "./confirm.service";
 import { GenericRecordsComponent } from "./generic-records.component";
@@ -142,6 +143,7 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
   private readonly parser: DOMParser = new DOMParser();
   private cachedEditingData: Record<string, CachedEditingData> =
     Object.create(null);
+  private packsChangeSub: Subscription;
 
   constructor(router: Router,
               files: XMLFilesService,
@@ -158,10 +160,14 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
 
     // We also want to clear our editing data and refresh when packs are
     // modified, deleted or added.
-    this.packsService.change.subscribe(() => {
+    this.packsChangeSub = this.packsService.change.subscribe(() => {
       this.cachedEditingData = Object.create(null);
       this.refresh();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.packsChangeSub.unsubscribe();
   }
 
   /**
