@@ -36,7 +36,7 @@ export class PacksService extends DBService<Pack, number> {
   private _matchingData?: MatchingData;
   constructor(private readonly chunksService: ChunksService) {
     super(db.packs);
-    this.change.subscribe(this.clearMatchingData);
+    this.change.subscribe(this.clearMatchingData.bind(this));
   }
 
   private clearMatchingData(): void {

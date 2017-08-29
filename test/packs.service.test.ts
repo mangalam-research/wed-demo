@@ -37,6 +37,9 @@ describe("PacksService", () => {
     service = new PacksService(chunkService);
     provider = new DataProvider("/base/test/data/");
     schema = await provider.getText("doc-annotated.js");
+  });
+
+  beforeEach(async () => {
     const packsUnserialized = [{
       name: "foo",
       interchangeVersion: 1,
@@ -68,7 +71,7 @@ describe("PacksService", () => {
     }
   });
 
-  after(() => db.delete().then(() => db.open()));
+  afterEach(() => db.delete().then(() => db.open()));
 
   describe("#makeRecord", () => {
     it("records metadata into a chunk", () =>
@@ -96,6 +99,20 @@ describe("PacksService", () => {
     it("matches automatically if there is an explicit match set", () =>
        expect(service.matchWithPack("moo", "moouri"))
        .to.eventually.have.property("id").equal(files["moo"].id));
+
+    it("adjusts when packs are modified", async () => {
+      const pack = await service.matchWithPack("moo", "moouri");
+      expect(pack).to.not.be.undefined;
+      // We test _matchingData to make sure it is created...
+      // tslint:disable-next-line:no-any
+      expect((service as any)._matchingData).to.not.be.undefined;
+      await service.deleteRecord(pack!);
+      // And flushed when a pack is deleted.
+      // tslint:disable-next-line:no-any
+      expect((service as any)._matchingData).to.be.undefined;
+      const packAgain = await service.matchWithPack("moo", "moouri");
+      expect(packAgain).to.be.undefined;
+    });
   });
 
   describe("#getDownloadData", () => {
@@ -132,7 +149,7 @@ describe("PacksService", () => {
         // tslint:disable-next-line:no-any
         let record: any;
         let downloadFile: Pack;
-        before(() => {
+        beforeEach(() => {
           record = records[testCase];
           const stringified = JSON.stringify(record);
           return service.makeRecord(record.name, stringified)
