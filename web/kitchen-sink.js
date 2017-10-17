@@ -133,8 +133,8 @@ define(function f(require) {
         .then(function start() {
           $(function ready() {
             var widget = document.getElementById("widget");
-            window.wed_editor = new wed.Editor();
-            window.wed_editor.init(widget, options, text);
+            window.wed_editor = new wed.Editor(widget, options);
+            window.wed_editor.init(text);
           });
         });
     });
