@@ -39,7 +39,7 @@ window.systemJSConfig = {
     bluejax: "npm:bluejax",
     "bluejax.try": "npm:bluejax.try",
     rangy: "npm:rangy",
-    wed: "npm:wed/standalone/lib/wed",
+    wed: "npm:wed/packed/lib/wed",
   },
   meta: {
     "npm:bootstrap/bootstrap/*.js": {

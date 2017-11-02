@@ -14,7 +14,7 @@ import { db } from "dashboard/store";
 
 import { ChunksService } from "dashboard/chunks.service";
 import { ConfirmService } from "dashboard/confirm.service";
-import { ControlComponent } from "dashboard/control.component";
+import { ControlComponent } from "dashboard/control/control.component";
 import { MetadataService } from "dashboard/metadata.service";
 import { PacksService } from "dashboard/packs.service";
 import { ProcessingService } from "dashboard/processing.service";

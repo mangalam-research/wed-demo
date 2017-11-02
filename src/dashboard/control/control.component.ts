@@ -1,12 +1,12 @@
 import { Component } from "@angular/core";
 import * as bootbox from "bootbox";
 
-import { ConfirmService } from "./confirm.service";
-import { ProcessingService } from "./processing.service";
-import { db } from "./store";
-import { readFile } from "./store-util";
-import { UpgradeService } from "./upgrade.service";
-import { triggerDownload } from "./util";
+import { ConfirmService } from "../confirm.service";
+import { ProcessingService } from "../processing.service";
+import { db } from "../store";
+import { readFile } from "../store-util";
+import { UpgradeService } from "../upgrade.service";
+import { triggerDownload } from "../util";
 
 @Component({
   selector: "control-component",

@@ -5,13 +5,13 @@ import { ActivatedRoute, Params } from "@angular/router";
 import { Subscription } from "rxjs";
 
 import { MetadataService,
-         NameIdArray as MetadataInfoArray } from "./metadata.service";
-import { ModesService } from "./modes.service";
-import { Pack } from "./pack";
-import { PacksService } from "./packs.service";
+         NameIdArray as MetadataInfoArray } from "../metadata.service";
+import { ModesService } from "../modes.service";
+import { Pack } from "../pack";
+import { PacksService } from "../packs.service";
 import { NameIdArray as SchemaInfoArray,
-         SchemasService } from "./schemas.service";
-import { updateFormErrors } from "./util";
+         SchemasService } from "../schemas.service";
+import { updateFormErrors } from "../util";
 
 @Component({
   selector: "pack-details-component",

@@ -6,18 +6,17 @@
 "use strict";
 
 import { Component, Inject, Optional } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
 
-import { ConfirmService } from "./confirm.service";
-import { GenericRecordsComponent } from "./generic-records.component";
-import { Pack } from "./pack";
-import { PacksService } from "./packs.service";
-import { ProcessingService } from "./processing.service";
-import { XML_FILES } from "./route-paths";
-import { XMLFile } from "./xml-file";
-import { XMLFilesService } from "./xml-files.service";
-import { XMLTransformService } from "./xml-transform.service";
+import { ConfirmService } from "../confirm.service";
+import { GenericRecordsComponent } from "../generic-records.component";
+import { Pack } from "../pack";
+import { PacksService } from "../packs.service";
+import { ProcessingService } from "../processing.service";
+import { XMLFile } from "../xml-file";
+import { XMLFilesService } from "../xml-files.service";
+import { XMLTransformService } from "../xml-transform.service";
 
 /**
  * This class records data that we need to build the rows of the files
@@ -131,7 +130,7 @@ export class CachedEditingData {
 @Component({
   selector: "xml-files-component",
   templateUrl: "./xml-files.component.html",
-  styleUrls: ["./generic-records.component.css"],
+  styleUrls: ["../generic-records.component.css"],
   providers: [
     { provide: "Loader", useExisting: XMLFilesService },
     { provide: "Clearable", useExisting: XMLFilesService },
@@ -144,14 +143,15 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
     Object.create(null);
   private packsChangeSub: Subscription;
 
-  constructor(router: Router,
+  constructor(route: ActivatedRoute,
+              router: Router,
               files: XMLFilesService,
               processing: ProcessingService,
               confirmService: ConfirmService,
               @Optional() @Inject(XMLTransformService)
               readonly xmlTransforms: XMLTransformService[] | null,
               private readonly packsService: PacksService) {
-    super(router, files, processing, confirmService, XML_FILES);
+    super(route, router, files, processing, confirmService);
   }
 
   ngOnInit(): void {

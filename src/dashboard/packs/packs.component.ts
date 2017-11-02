@@ -6,22 +6,21 @@
 "use strict";
 
 import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
-import { Pack } from "./pack";
-import { PACKS } from "./route-paths";
+import { Pack } from "../pack";
 
-import { GenericRecordsComponent } from "./generic-records.component";
+import { GenericRecordsComponent } from "../generic-records.component";
 
-import { ConfirmService } from "./confirm.service";
-import { PacksService } from "./packs.service";
-import { ProcessingService } from "./processing.service";
-import { XMLFilesService } from "./xml-files.service";
+import { ConfirmService } from "../confirm.service";
+import { PacksService } from "../packs.service";
+import { ProcessingService } from "../processing.service";
+import { XMLFilesService } from "../xml-files.service";
 
 @Component({
   selector: "packs-component",
   templateUrl: "./packs.component.html",
-  styleUrls: ["./generic-records.component.css"],
+  styleUrls: ["../generic-records.component.css"],
   providers: [
     { provide: "Loader", useExisting: PacksService },
     { provide: "Clearable", useExisting: PacksService },
@@ -31,12 +30,13 @@ export class PacksComponent extends
 GenericRecordsComponent<Pack, PacksService> {
   // We must have the constructor here so that it can be annotated by the
   // decorator and Angular can find its bearings.
-  constructor(router: Router,
+  constructor(route: ActivatedRoute,
+              router: Router,
               files: PacksService,
               processing: ProcessingService,
               confirmService: ConfirmService,
               private readonly xmlFiles: XMLFilesService) {
-    super(router, files, processing, confirmService, PACKS);
+    super(route, router, files, processing, confirmService);
   }
 
   del(record: Pack): Promise<void> {

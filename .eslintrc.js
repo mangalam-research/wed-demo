@@ -2,6 +2,9 @@ module.exports = {
   extends: [
     "lddubeau-base"
   ],
+  env: {
+    node: true,
+  },
   rules: {
     "no-continue": "off",
     "import/no-extraneous-dependencies": "off",

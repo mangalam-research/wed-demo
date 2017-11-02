@@ -23,6 +23,9 @@
   config.map.sinon = "npm:sinon";
   config.map["sinon-chai"] = "npm:sinon-chai";
   config.map["check-error"] = "npm:check-error/check-error.js";
+  config.map["@angular/router/testing"] =
+    "npm:@angular/router/bundles/router-testing.umd.js";
+
   SystemJS.config(config);
 
   // These are preloaded by Karma as scripts that leak into the global space.

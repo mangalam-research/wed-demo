@@ -12,7 +12,7 @@ import { DebugElement } from "@angular/core";
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
-import { Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 
 import { db } from "dashboard/store";
 
@@ -24,19 +24,14 @@ import { PacksService } from "dashboard/packs.service";
 import { ProcessingService } from "dashboard/processing.service";
 import { UploadComponent } from "dashboard/upload.component";
 import { XMLFile } from "dashboard/xml-file";
-import { XMLFilesComponent } from "dashboard/xml-files.component";
 import { XMLFilesService } from "dashboard/xml-files.service";
+import { XMLFilesComponent } from "dashboard/xml-files/xml-files.component";
 
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";
 import { DataProvider, expectReject, waitFor, waitForSuccess } from "./util";
 
-// tslint:disable: no-empty
-class RouterStub {
-  // tslint:disable-next-line:no-any
-  navigate(..._args: any[]): any {}
-}
-
+// tslint:disable:no-empty
 class FakeProcessingService {
   start(_total: number): void {}
 
@@ -44,7 +39,7 @@ class FakeProcessingService {
 
   stop(): void {}
 }
-// tslint:enable
+// tslint:enable:no-empty
 
 describe("XMLFilesComponent", () => {
   let component: XMLFilesComponent;
@@ -99,6 +94,9 @@ describe("XMLFilesComponent", () => {
     fakeConfirmer.returns(Promise.resolve(true));
     fakePrompter = sandbox.stub();
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule.withRoutes([]),
+      ],
       declarations: [ ClearStoreComponent, UploadComponent, XMLFilesComponent ],
       providers: [
         { provide: ComponentFixtureAutoDetect, useValue: true },
@@ -109,7 +107,7 @@ describe("XMLFilesComponent", () => {
         PacksService,
         { provide: "Confirmer", useValue: fakeConfirmer },
         { provide: "Prompter", useValue: fakePrompter },
-        { provide: Router, useClass: RouterStub }],
+      ],
     });
 
     await TestBed.compileComponents();

@@ -22,13 +22,13 @@
     }
   ],
   "dependencies": {
-    "@angular/common": "^4.3.5",
-    "@angular/compiler": "^4.3.5",
-    "@angular/core": "^4.3.5",
-    "@angular/forms": "^4.3.5",
-    "@angular/platform-browser": "^4.3.5",
-    "@angular/platform-browser-dynamic": "^4.3.5",
-    "@angular/router": "^4.3.5",
+    "@angular/common": "^4.4.6",
+    "@angular/compiler": "^4.4.6",
+    "@angular/core": "^4.4.6",
+    "@angular/forms": "^4.4.6",
+    "@angular/platform-browser": "^4.4.6",
+    "@angular/platform-browser-dynamic": "^4.4.6",
+    "@angular/router": "^4.4.6",
     "@types/bluebird": "^3.5.2",
     "@types/blueimp-md5": "^1.1.30",
     "@types/bootbox": "^4.4.30",
@@ -57,6 +57,7 @@
     "zone.js": "^0.8.10"
   },
   "devDependencies": {
+    "@angular/compiler-cli": "^4.4.6",
     "@ngtools/webpack": "^1.7.4",
     "@types/chai": "^3.4.35",
     "@types/chai-as-promised": "0.0.31",
@@ -64,9 +65,9 @@
     "@types/node": "^7.0.5",
     "@types/sinon": "^1.16.35",
     "@types/sinon-chai": "^2.7.27",
-    "angular2-template-loader": "^0.6.2",
     "chai": ">=3 <4",
     "chai-as-promised": "^6.0.0",
+    "child-process-promise": "^2.2.1",
     "del": ">=2.0.2 <3",
     "eslint": "^3.16.1",
     "eslint-config-lddubeau-base": "^1.0.4",
@@ -79,7 +80,9 @@
     "gulp-replace": "^0.5.4",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-typescript": "^3.2.0",
+    "gulp-util": "^3.0.8",
     "html-loader": "^0.4.4",
+    "json-loader": "^0.5.7",
     "karma": "^1.4.1",
     "karma-chai": "^0.1.0",
     "karma-chai-as-promised": "^0.1.2",
@@ -99,11 +102,11 @@
     "sinon": "https://registry.npmjs.org/sinon/-/sinon-1.17.5.tgz",
     "sinon-chai": "^2.9.0",
     "touch": ">=1.0.0 <2",
-    "ts-loader": "^2.0.0",
+    "ts-loader": "^3.1.1",
     "tslint": "^5.6.0",
     "tslint-config-lddubeau": "^2.0.0",
     "typescript": "2.4",
-    "webpack": "^2.2.1"
+    "webpack": "^3.8.1"
   },
   "scripts": {
     "test": "gulp test"

@@ -1,4 +1,4 @@
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
 
 import { ConfirmService } from "./confirm.service";
@@ -12,11 +12,11 @@ RecordService extends DBService<RecordType, number>> {
   records: RecordType[];
   changeSub: Subscription;
 
-  constructor(protected readonly router: Router,
+  constructor(protected readonly route: ActivatedRoute,
+              protected readonly router: Router,
               protected readonly files: RecordService,
               protected readonly processing: ProcessingService,
-              protected readonly confirmService: ConfirmService,
-              protected readonly detailRoutePrefix: string) {}
+              protected readonly confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.changeSub = this.files.change.subscribe(() => {
@@ -97,7 +97,7 @@ RecordService extends DBService<RecordType, number>> {
     }
 
     // tslint:disable-next-line:no-floating-promises
-    this.router.navigate([this.detailRoutePrefix, record.id]);
+    this.router.navigate([".", record.id], { relativeTo: this.route });
   }
 
   trackByName(record: RecordType): string {

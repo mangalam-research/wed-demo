@@ -7,27 +7,21 @@ import { DebugElement } from "@angular/core";
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
-import { Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 
 import { db } from "dashboard/store";
 
 import { ChunksService } from "dashboard/chunks.service";
 import { ClearStoreComponent } from "dashboard/clear-store.component";
 import { ConfirmService } from "dashboard/confirm.service";
-import { MetadataComponent } from "dashboard/metadata.component";
 import { MetadataService } from "dashboard/metadata.service";
+import { MetadataComponent } from "dashboard/metadata/metadata.component";
 import { ProcessingService } from "dashboard/processing.service";
 import { UploadComponent } from "dashboard/upload.component";
 
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";
 import { waitFor } from "./util";
-
-// tslint:disable: no-empty
-class RouterStub {
-  // tslint:disable-next-line:no-any
-  navigate(..._args: any[]): any {}
-}
 
 describe("MetadataComponent", () => {
   let component: MetadataComponent;
@@ -47,6 +41,9 @@ describe("MetadataComponent", () => {
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule.withRoutes([]),
+      ],
       declarations: [ ClearStoreComponent, UploadComponent, MetadataComponent ],
       providers: [
         { provide: ComponentFixtureAutoDetect, useValue: true },
@@ -55,7 +52,7 @@ describe("MetadataComponent", () => {
         ProcessingService,
         MetadataService,
         { provide: "Confirmer", useValue: fakeConfirmer },
-        { provide: Router, useClass: RouterStub }],
+      ],
     });
 
     return TestBed.compileComponents()

@@ -9,28 +9,30 @@
     <link href="/node_modules/wed/standalone/lib/wed/wed.css" type="text/css"
           media="screen"
           rel="stylesheet" />
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/external/core-js.min.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/external/bluebird.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/external/classList.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/contains.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/matches.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/innerHTML_for_XML.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/closest.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/firstElementChild_etc.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/wed/polyfills/normalize.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/lib/requirejs/require.js"></script>
-    <script type="text/javascript" src="/node_modules/wed/standalone/requirejs-config.js"></script>
     <script>
-      require.config({
-        baseUrl: "/node_modules/wed/packed/lib",
-        paths: {
-          "dashboard": "/build/dev/lib/dashboard",
-          "blueimp-md5": "/node_modules/blueimp-md5/js/md5.min",
-          "wed-store": "/build/dev/lib/wed-store",
-          "kitchen-sink": "/build/dev/lib/kitchen-sink",
-        },
-      });
+      (function () {
+        var a = document.createElement("a");
+        a.href = ".";
+        var process = window.process = (window.process || {});
+        var env = process.env = (process.env || {});
+        env.DASHBOARD_BASE = a.pathname;
+      }());
     </script>
+    <script data-script-type="set-environment" type="text/javascript">
+      process.env.NODE_ENV = "development";
+    </script>
+    <script src="/node_modules/wed/packed/lib/external/core-js.min.js"></script>
+    <script src="/node_modules/wed/packed/lib/external/bluebird.js"></script>
+    <script src="/node_modules/wed/packed/lib/external/classList.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/contains.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/matches.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/innerHTML_for_XML.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/closest.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/firstElementChild_etc.js"></script>
+    <script src="/node_modules/wed/packed/lib/wed/polyfills/normalize.js"></script>
+    <script src="/node_modules/wed/packed/lib/requirejs/require.js"></script>
+    <script src="/node_modules/wed/packed/requirejs-config.js"></script>
+    <script src="requirejs-local-config.js"></script>
   </head>
   <body>
     <div class="container">

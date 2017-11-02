@@ -2,17 +2,17 @@ import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Params } from "@angular/router";
 
-import { Schema } from "./schema";
-import { SchemasService } from "./schemas.service";
+import { Metadata } from "../metadata";
+import { MetadataService } from "../metadata.service";
 
 @Component({
-  selector: "schema-details-component",
-  templateUrl: "./schema-details.component.html",
+  selector: "metadata-details-component",
+  templateUrl: "./metadata-details.component.html",
 })
-export class SchemaDetailsComponent implements OnInit {
-  file: Schema;
+export class MetadataDetailsComponent implements OnInit {
+  file: Metadata;
 
-  constructor(private files: SchemasService,
+  constructor(private files: MetadataService,
               private route: ActivatedRoute,
               private location: Location) {}
 

@@ -11,6 +11,7 @@ const expect = chai.expect;
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 
 import { db } from "dashboard/store";
 
@@ -21,8 +22,8 @@ import { PacksService } from "dashboard/packs.service";
 import { ProcessingService } from "dashboard/processing.service";
 import { UploadComponent } from "dashboard/upload.component";
 import { XMLFile } from "dashboard/xml-file";
-import { XMLFilesComponent } from "dashboard/xml-files.component";
 import { XMLFilesService } from "dashboard/xml-files.service";
+import { XMLFilesComponent } from "dashboard/xml-files/xml-files.component";
 import { waitFor, waitForSuccess } from "./util";
 
 //
@@ -32,10 +33,6 @@ import { waitFor, waitForSuccess } from "./util";
 // tslint:disable:no-any
 
 // tslint:disable:no-empty
-class RouterStub {
-  navigate(..._args: any[]): any {}
-}
-
 class FakeProcessingService {
   start(_total: number): void {}
 
@@ -53,11 +50,15 @@ describe("GenericRecordsComponent", () => {
   let recordsService: XMLFilesService;
   let fakeConfirmer: sinon.SinonStub;
   let records: XMLFile[];
+  let router: Router;
 
   beforeEach(async () => {
     sandbox = sinon.sandbox.create();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule.withRoutes([]),
+      ],
       declarations: [ ClearStoreComponent, UploadComponent, XMLFilesComponent ],
       providers: [
         { provide: ComponentFixtureAutoDetect, useValue: true },
@@ -67,11 +68,12 @@ describe("GenericRecordsComponent", () => {
         XMLFilesService,
         PacksService,
         { provide: "Confirmer", useValue: fakeConfirmer },
-        { provide: Router, useClass: RouterStub }],
+      ],
     });
 
     await TestBed.compileComponents();
     recordsService = TestBed.get(XMLFilesService);
+    router = TestBed.get(Router);
     records = await Promise.all(
       [{name: "a", data: "foo"},
        {name: "b", data: "foo b"}]
@@ -179,11 +181,11 @@ describe("GenericRecordsComponent", () => {
 
   describe("#showDetails", () => {
     it("changes the route to the record", () => {
-      const stub = sandbox.stub(RouterStub.prototype);
+      const stub = sandbox.stub(router);
       component.showDetails(records[0]);
       expect((stub as any).navigate.firstCall)
-        .to.have.been.calledWith([(component as any).detailRoutePrefix,
-                                  records[0].id]);
+        .to.have.been.calledWith([".", records[0].id],
+                                 { relativeTo: (component as any).route });
     });
   });
 });

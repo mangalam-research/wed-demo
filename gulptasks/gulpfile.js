@@ -1,4 +1,5 @@
 const gulp = require("gulp");
+const gutil = require("gulp-util");
 const gulpNewer = require("gulp-newer");
 const Promise = require("bluebird");
 const path = require("path");
@@ -6,14 +7,14 @@ const es = require("event-stream");
 const requireDir = require("require-dir");
 const eslint = require("gulp-eslint");
 const replace = require("gulp-replace");
-// const webpack = require("webpack");
 const argparse = require("argparse");
 const gulpTs = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
-// const webWebpackConfig = require("../web/webpack.config");
 const config = require("./config");
-const { del, fs, newer, exec, execFile, spawn,
-        mkdirpAsync } = require("./util");
+const cpp = require("child-process-promise");
+const { del, fs, newer, exec, spawn, mkdirpAsync } = require("./util");
+
+const execFile = cpp.execFile;
 
 const ArgumentParser = argparse.ArgumentParser;
 
@@ -58,13 +59,6 @@ const options = config.options = parser.parseArgs(process.argv.slice(2));
 // configuration is set once and for all before they execute. Doing
 // this allows having code that depends on the configuration values.
 requireDir(".");
-
-
-const buildDeps = ["build-dev"];
-// if (options.optimize) {
-//   buildDeps.push("build-dev-optimized");
-// }
-gulp.task("build", buildDeps);
 
 const moduleFix = /^(define\(\["require", "exports")(.*?\], function \(require, exports)(.*)$/m;
 function tsc(project) {
@@ -122,6 +116,17 @@ gulp.task("copy-other",
 
 gulp.task("build-dev", ["tsc", "copy-other", "copy-package-info"]);
 
+gulp.task("webpack", ["copy-other"], () =>
+          execFile("./node_modules/.bin/webpack", ["--color"])
+          .then((result) => {
+            gutil.log(result.stdout);
+          }, (err) => {
+            gutil.log(err.stdout);
+            throw err;
+          }));
+
+gulp.task("build-prod", ["webpack"]);
+
 gulp.task("build-info", Promise.coroutine(function *task() {
   const dest = "build/dev/lib/build-info.js";
   const isNewer = yield newer(["lib/**", "!**/*_flymake.*"], dest);
@@ -135,20 +140,7 @@ gulp.task("build-info", Promise.coroutine(function *task() {
              `--module > ${dest}`);
 }));
 
-function htmlTask(suffix) {
-  gulp.task(`build-html${suffix}`, () => {
-    const dest = `build/dev${suffix}`;
-    return gulp.src(["web/*.html", "web/dashboard/index.html"],
-                    { base: "web" })
-      .pipe(gulpNewer(dest))
-      .pipe(gulp.dest(dest));
-  });
-}
-
-htmlTask("");
-htmlTask("-optimized");
-
-gulp.task("default", ["build"]);
+gulp.task("default", ["build-dev"]);
 
 function runTslint(tsconfig, tslintConfig) {
   return spawn(
@@ -194,13 +186,13 @@ gulp.task("test-karma", ["build-dev"],
 gulp.task("test", ["test-karma", "tslint", "eslint"]);
 
 let packname;
-gulp.task("pack", ["test"],
+gulp.task("pack", ["test", "build-prod"],
   () => execFile("npm", ["pack", "."], { cwd: "build" })
-    .then(([_packname]) => {
-      packname = _packname.trim();
+    .then((result) => {
+      packname = result.stdout.trim();
     }));
 
-gulp.task("pack-notest", ["default"],
+gulp.task("pack-notest", ["build-prod"],
           () => execFile("npm", ["pack", "."], { cwd: "build" }));
 
 gulp.task("install-test", ["pack"], Promise.coroutine(function *install() {

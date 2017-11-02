@@ -4,10 +4,10 @@ import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Params } from "@angular/router";
 import { Subscription } from "rxjs";
 
-import { NameIdArray, PacksService } from "./packs.service";
-import { updateFormErrors } from "./util";
-import { XMLFile } from "./xml-file";
-import { XMLFilesService } from "./xml-files.service";
+import { NameIdArray, PacksService } from "../packs.service";
+import { updateFormErrors } from "../util";
+import { XMLFile } from "../xml-file";
+import { XMLFilesService } from "../xml-files.service";
 
 @Component({
   selector: "xml-file-details-component",

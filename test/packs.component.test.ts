@@ -12,7 +12,7 @@ import { DebugElement } from "@angular/core";
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
-import { Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 
 import { db } from "dashboard/store";
 
@@ -20,8 +20,8 @@ import { ChunksService } from "dashboard/chunks.service";
 import { ClearStoreComponent } from "dashboard/clear-store.component";
 import { ConfirmService } from "dashboard/confirm.service";
 import { Pack } from "dashboard/pack";
-import { PacksComponent } from "dashboard/packs.component";
 import { PacksService } from "dashboard/packs.service";
+import { PacksComponent } from "dashboard/packs/packs.component";
 import { ProcessingService } from "dashboard/processing.service";
 import { UploadComponent } from "dashboard/upload.component";
 import { XMLFile } from "dashboard/xml-file";
@@ -30,12 +30,6 @@ import { XMLFilesService } from "dashboard/xml-files.service";
 import { ComponentTestState, eventTests,
          renderTests } from "./common-component.tests";
 import { waitFor, waitForSuccess } from "./util";
-
-// tslint:disable: no-empty
-class RouterStub {
-  // tslint:disable-next-line:no-any
-  navigate(..._args: any[]): any {}
-}
 
 describe("PacksComponent", () => {
   let component: PacksComponent;
@@ -90,6 +84,9 @@ describe("PacksComponent", () => {
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule.withRoutes([]),
+      ],
       declarations: [ ClearStoreComponent, UploadComponent, PacksComponent ],
       providers: [
         { provide: ComponentFixtureAutoDetect, useValue: true },
@@ -99,7 +96,7 @@ describe("PacksComponent", () => {
         PacksService,
         XMLFilesService,
         { provide: "Confirmer", useValue: fakeConfirmer },
-        { provide: Router, useClass: RouterStub }],
+      ],
     });
 
     return TestBed.compileComponents()
