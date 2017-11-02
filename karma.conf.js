@@ -105,7 +105,7 @@ module.exports = function configure(config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ["Chrome"],
+    browsers: ["ChromeHeadless"],
     singleRun: false,
     concurrency: Infinity,
   });
