@@ -8,8 +8,7 @@
 define(function f(require) {
   "use strict";
 
-  var wed = require("wed/wed");
-  var runtime = require("wed/runtime");
+  var wed = require("wed");
   var store = require("dashboard/store");
   var $ = require("jquery");
   var URI = require("urijs/URI");
@@ -90,7 +89,7 @@ define(function f(require) {
         }
       }
 
-      var r = new runtime.Runtime(options);
+      var r = new wed.Runtime(options);
 
       var deps = [localstorage];
 
@@ -133,7 +132,7 @@ define(function f(require) {
         .then(function start() {
           $(function ready() {
             var widget = document.getElementById("widget");
-            window.wed_editor = new wed.Editor(widget, options);
+            window.wed_editor = wed.makeEditor(widget, options);
             window.wed_editor.init(text);
           });
         });
