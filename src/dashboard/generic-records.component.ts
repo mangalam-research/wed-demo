@@ -99,4 +99,8 @@ RecordService extends DBService<RecordType, number>> {
     // tslint:disable-next-line:no-floating-promises
     this.router.navigate([this.detailRoutePrefix, record.id]);
   }
+
+  trackByName(record: RecordType): string {
+    return record.name;
+  }
 }
