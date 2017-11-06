@@ -6,6 +6,13 @@
           type="text/css" media="screen" rel="stylesheet"/>
     <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css"
           type="text/css" media="screen" rel="stylesheet"/>
+    <script class="set-environment" type="text/javascript">
+      window.process = {
+        env: {
+          NODE_ENV: "development",
+        },
+      };
+    </script>
     <script type="text/javascript" src="/node_modules/core-js/client/shim.min.js"></script>
     <script type="text/javascript" src="/node_modules/zone.js/dist/zone.js"></script>
     <script type="text/javascript" src="/node_modules/wed/standalone/lib/external/classList.js"></script>

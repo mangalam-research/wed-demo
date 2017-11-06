@@ -7,6 +7,7 @@
 // can be modified before actually configuring SystemJS. The fact is that
 // SystemJS (contrarily to RequireJS) does not handle changing the baseURL.
 // See: https://github.com/systemjs/systemjs/issues/1208#issuecomment-215707469
+/* global process */
 window.systemJSConfig = {
   baseURL: "..",
   pluginFirst: true,
@@ -41,12 +42,6 @@ window.systemJSConfig = {
     wed: "npm:wed/standalone/lib/wed",
   },
   meta: {
-    "dashboard/*": {
-      loader: "ng-loader",
-    },
-    "dashboard/*/*": {
-      loader: "ng-loader",
-    },
     "npm:bootstrap/bootstrap/*.js": {
       format: "global",
       deps: ["jquery"],
@@ -64,6 +59,20 @@ window.systemJSConfig = {
     "npm:*/package.json",
   ],
 };
+
+//
+// For better or for worse, pooling process.env.NODE_ENV is the default. :-/
+//
+// Our default is to assume a production environment. So check whether we are
+// in development mode.
+if (typeof process !== "undefined" &&
+    typeof process.env !== "undefined" &&
+    process.env.NODE_ENV === "development") {
+  var systemJSConfig = window.systemJSConfig;
+  systemJSConfig.meta["dashboard/*"] = systemJSConfig.meta["dashboard/*/*"] = {
+    loader: "ng-loader",
+  };
+}
 
 //  LocalWords:  popup onerror findandself jQuery Dubeau MPL Mangalam
 //  LocalWords:  txt tei ajax jquery

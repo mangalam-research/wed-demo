@@ -67,6 +67,7 @@ module.exports = function configure(config) {
       "node_modules/wed/standalone/lib/wed/polyfills/matches.js",
       "node_modules/wed/standalone/lib/wed/polyfills/innerHTML_for_XML.js",
       "node_modules/systemjs/dist/system.src.js",
+      "test/karma-env.js",
       "web/system.config.js",
       "test/karma-main.js",
       { pattern: "test/**/*.ts", included: false },
