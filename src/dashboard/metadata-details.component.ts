@@ -6,7 +6,6 @@ import { Metadata } from "./metadata";
 import { MetadataService } from "./metadata.service";
 
 @Component({
-  moduleId: module.id,
   selector: "metadata-details-component",
   templateUrl: "./metadata-details.component.html",
 })

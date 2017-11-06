@@ -12,7 +12,6 @@ import { Loader } from "./db.service";
 import { ProcessingService } from "./processing.service";
 
 @Component({
-  moduleId: module.id,
   selector: "upload-component",
   templateUrl: "./upload.component.html",
 })

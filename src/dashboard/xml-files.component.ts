@@ -129,7 +129,6 @@ export class CachedEditingData {
 }
 
 @Component({
-  moduleId: module.id,
   selector: "xml-files-component",
   templateUrl: "./xml-files.component.html",
   styleUrls: ["./generic-records.component.css"],

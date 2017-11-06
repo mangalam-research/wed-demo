@@ -10,7 +10,6 @@ import { XMLFile } from "./xml-file";
 import { XMLFilesService } from "./xml-files.service";
 
 @Component({
-  moduleId: module.id,
   selector: "xml-file-details-component",
   templateUrl: "./xml-file-details.component.html",
 })

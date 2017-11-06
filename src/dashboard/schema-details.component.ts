@@ -6,7 +6,6 @@ import { Schema } from "./schema";
 import { SchemasService } from "./schemas.service";
 
 @Component({
-  moduleId: module.id,
   selector: "schema-details-component",
   templateUrl: "./schema-details.component.html",
 })

@@ -16,7 +16,6 @@ import { ProcessingService } from "./processing.service";
 import { METADATA } from "./route-paths";
 
 @Component({
-  moduleId: module.id,
   selector: "metadata-component",
   templateUrl: "./metadata.component.html",
   styleUrls: ["./generic-records.component.css"],

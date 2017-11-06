@@ -3,7 +3,6 @@ import { Component, OnInit } from "@angular/core";
 import { UpgradeService } from "./upgrade.service";
 
 @Component({
-  moduleId: module.id,
   selector: "dashboard-app",
   templateUrl: "./app.component.html",
 })

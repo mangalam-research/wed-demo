@@ -9,7 +9,6 @@ import { UpgradeService } from "./upgrade.service";
 import { triggerDownload } from "./util";
 
 @Component({
-  moduleId: module.id,
   selector: "control-component",
   templateUrl: "./control.component.html",
 })

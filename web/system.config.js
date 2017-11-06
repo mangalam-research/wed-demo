@@ -23,6 +23,7 @@ window.systemJSConfig = {
     "@angular/http": "npm:@angular/http/bundles/http.umd.js",
     "@angular/router": "npm:@angular/router/bundles/router.umd.js",
     "@angular/forms": "npm:@angular/forms/bundles/forms.umd.js",
+    "ng-loader": "systemjs-angular-loader.js",
     rxjs: "npm:rxjs",
     jquery: "npm:jquery",
     bootstrap: "npm:bootstrap/dist/js/bootstrap.js",
@@ -40,20 +41,21 @@ window.systemJSConfig = {
     wed: "npm:wed/standalone/lib/wed",
   },
   meta: {
-    "mmwp/internal-schemas/*": {
-      loader: "json",
+    "dashboard/*": {
+      loader: "ng-loader",
+    },
+    "dashboard/*/*": {
+      loader: "ng-loader",
+    },
+    "npm:bootstrap/bootstrap/*.js": {
+      format: "global",
+      deps: ["jquery"],
+      exports: "$",
     },
   },
   packages: {
     "": {
       defaultExtension: "js",
-      meta: {
-        "npm:bootstrap/bootstrap/*.js": {
-          format: "global",
-          deps: ["jquery"],
-          exports: "$",
-        },
-      },
     },
   },
   packageConfigPaths: [

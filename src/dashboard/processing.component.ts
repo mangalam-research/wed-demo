@@ -5,7 +5,6 @@ import * as $ from "jquery";
 import { ProcessingService } from "./processing.service";
 
 @Component({
-  moduleId: module.id,
   selector: "processing-component",
   templateUrl: "./processing.component.html",
 })

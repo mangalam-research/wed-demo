@@ -16,7 +16,6 @@ import { Schema } from "./schema";
 import { SchemasService } from "./schemas.service";
 
 @Component({
-  moduleId: module.id,
   selector: "schemas-component",
   templateUrl: "./schemas.component.html",
   styleUrls: ["./generic-records.component.css"],

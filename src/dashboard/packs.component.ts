@@ -19,7 +19,6 @@ import { ProcessingService } from "./processing.service";
 import { XMLFilesService } from "./xml-files.service";
 
 @Component({
-  moduleId: module.id,
   selector: "packs-component",
   templateUrl: "./packs.component.html",
   styleUrls: ["./generic-records.component.css"],

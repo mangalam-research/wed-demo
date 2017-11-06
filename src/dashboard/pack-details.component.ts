@@ -14,7 +14,6 @@ import { NameIdArray as SchemaInfoArray,
 import { updateFormErrors } from "./util";
 
 @Component({
-  moduleId: module.id,
   selector: "pack-details-component",
   templateUrl: "./pack-details.component.html",
 })

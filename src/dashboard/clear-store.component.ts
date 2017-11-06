@@ -6,7 +6,6 @@ import { ConfirmService } from "./confirm.service";
 import { Clearable } from "./db.service";
 
 @Component({
-  moduleId: module.id,
   selector: "clear-store-component",
   template: `\
 <button (click)="clearClicked()" class="form-control pull-right" \
