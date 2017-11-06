@@ -11,7 +11,6 @@ import { ProcessingComponent } from "dashboard/processing.component";
 import { ProcessingService } from "dashboard/processing.service";
 
 describe("ProcessingComponent", () => {
-  let component: ProcessingComponent;
   let service: ProcessingService;
   let fixture: ComponentFixture<ProcessingComponent>;
   let de: DebugElement;
@@ -27,7 +26,6 @@ describe("ProcessingComponent", () => {
     return TestBed.compileComponents().then(() => {
       fixture = TestBed.createComponent(ProcessingComponent);
       service = TestBed.get(ProcessingService);
-      component = fixture.componentInstance;
       de = fixture.debugElement.query(By.css(".modal"));
       el = de.nativeElement;
       progress = el.getElementsByClassName("bar")[0] as HTMLElement;

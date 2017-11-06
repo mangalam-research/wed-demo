@@ -8,10 +8,8 @@ chai.use(sinonChai);
 
 const expect = chai.expect;
 
-import { DebugElement } from "@angular/core";
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
-import { By } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 
 import { db } from "dashboard/store";
@@ -51,8 +49,6 @@ describe("GenericRecordsComponent", () => {
   // Since it is a generic, we test it through XMLFilesComponent.
   let component: XMLFilesComponent;
   let fixture: ComponentFixture<XMLFilesComponent>;
-  let de: DebugElement;
-  let el: HTMLElement;
   let sandbox: sinon.SinonSandbox;
   let recordsService: XMLFilesService;
   let fakeConfirmer: sinon.SinonStub;
@@ -86,8 +82,6 @@ describe("GenericRecordsComponent", () => {
 
     fixture = TestBed.createComponent(XMLFilesComponent);
     component = fixture.componentInstance;
-    de = fixture.debugElement.query(By.css("div"));
-    el = de.nativeElement;
 
     // Wait until the component has refreshed.
     await waitFor(() => component.records != null &&

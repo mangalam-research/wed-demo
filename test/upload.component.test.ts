@@ -5,9 +5,7 @@ import * as sinon from "sinon";
 
 const expect = chai.expect;
 
-import { DebugElement } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { By } from "@angular/platform-browser";
 
 import { ConfirmService } from "dashboard/confirm.service";
 import { Loader } from "dashboard/db.service";
@@ -42,8 +40,6 @@ class FakeProcessingService {
 describe("UploadComponent", () => {
   let component: UploadComponent;
   let fixture: ComponentFixture<UploadComponent>;
-  let de: DebugElement;
-  let el: HTMLInputElement;
   let sandbox: sinon.SinonSandbox;
   let fakeConfirmer: sinon.SinonStub;
 
@@ -63,8 +59,6 @@ describe("UploadComponent", () => {
     return TestBed.compileComponents().then(() => {
       fixture = TestBed.createComponent(UploadComponent);
       component = fixture.componentInstance;
-      de = fixture.debugElement.query(By.css("input"));
-      el = de.nativeElement;
     });
   });
 
