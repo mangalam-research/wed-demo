@@ -77,8 +77,8 @@ module.exports = function configure(config) {
     exclude: [],
     preprocessors: {
       "test/**/*.ts": ["typescript"],
-      "build/standalone/lib/dashboard.js": coverage,
-      "build/standalone/lib/dashboard/**/!(*.map).js": coverage,
+      "build/dev/lib/dashboard.js": coverage,
+      "build/dev/lib/dashboard/**/!(*.map).js": coverage,
     },
     typescriptPreprocessor: {
       tsconfigPath: "./test/tsconfig.json",
