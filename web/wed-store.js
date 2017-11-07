@@ -7,8 +7,6 @@
 define(function f(require) {
   "use strict";
   var store = require("dashboard/store");
-  var xmlFile = require("dashboard/xml-file");
-  var Chunk = require("dashboard/chunk").Chunk;
 
   var db = store.db;
 
@@ -32,7 +30,7 @@ define(function f(require) {
           throw new Error("unexpected record version number: " + rec.version);
         }
 
-        return Chunk.makeChunk(data)
+        return store.Chunk.makeChunk(data)
           .then(function chunked(chunk) {
             return me._store.chunks.put(chunk)
               .then(function savedChunk() {
@@ -42,11 +40,6 @@ define(function f(require) {
               });
           });
       });
-  };
-
-  // Right now this function is mostly used in testing.
-  WedStore.prototype.makeFileRecord = function makeFileRecord(name, data) {
-    return new xmlFile.XMLFile(name, data);
   };
 
   return new WedStore();

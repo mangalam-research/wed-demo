@@ -23,6 +23,14 @@ import { Schema } from "./schema";
 import { readFile } from "./store-util";
 import { XMLFile } from "./xml-file";
 
+//
+// We reexport this because the adapter for wed (wed-store) needs to be able to
+// create Chunks. It also needs to load this module to manipulate the
+// database. It is better to have store be a facade providing everything the
+// adapter needs, than require the adapter to also load "./chunk" manually.
+//
+export { Chunk };
+
 export type XMLFilesTable = Dexie.Table<XMLFile, number>;
 export type PackTable = Dexie.Table<Pack, number>;
 export type SchemaTable = Dexie.Table<Schema, number>;
