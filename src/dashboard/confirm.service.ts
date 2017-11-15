@@ -19,20 +19,27 @@ export function bootboxAlerter(message: string): Promise<void> {
   });
 }
 
+// This next annotation is necessary to prevent ngc from freaking out when
+// emitting metadata due to the ``Confirmer``, ``Prompter`` and ``Alerter``
+// types below.
+//
+// See: https://github.com/angular/angular/issues/20351#issuecomment-344009887
+//
+/** @dynamic */
 @Injectable()
 export class ConfirmService {
   private readonly confirmer: Confirmer = safeConfirm;
   private readonly prompter: Prompter = bootboxPrompter;
   private readonly alerter: Alerter = bootboxAlerter;
 
-  // We cannot use TypeScript's support for default parameter values because
-  // @Optional passes ``null`` if no value has been specified, but TypeScript's
-  // generated code only checks for ``undefined`` when deciding to check whether
-  // to use the default value. (IOW, an argument of ``null`` means: don't use
-  // the default value. Sigh...
   constructor(@Optional() @Inject("Confirmer") confirmer: Confirmer | undefined,
               @Optional() @Inject("Prompter") prompter: Prompter | undefined,
               @Optional() @Inject("Alerter") alerter: Alerter | undefined) {
+    // We cannot use TypeScript's support for default parameter values because
+    // @Optional passes ``null`` if no value has been specified, but
+    // TypeScript's generated code only checks for ``undefined`` when deciding
+    // to check whether to use the default value. (IOW, an argument of ``null``
+    // means: don't use the default value.) Sigh...
     if (confirmer != null) {
       this.confirmer = confirmer;
     }
