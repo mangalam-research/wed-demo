@@ -4,10 +4,8 @@
 const path = require("path");
 const webpack = require("webpack");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const { AotPlugin } = require("@ngtools/webpack");
 
-const sourceDir = "src";
-const tsConfigPath = path.join(sourceDir, "tsconfig.json");
+const sourceDir = "./build/aot-compiled/";
 
 const commonExternals = {};
 ["jquery", "bootstrap", "dexie",
@@ -44,10 +42,6 @@ function createMakeExternals(mapping) {
 
 const common = {
   context: __dirname,
-  resolve: {
-    modules: [sourceDir, "node_modules"],
-    extensions: [".ts", ".tsx", ".js", ".jsx"],
-  },
   devtool: "source-map",
   output: {
     path: path.join(__dirname, "build/prod/lib/"),
@@ -66,15 +60,25 @@ const common = {
 
 module.exports = [{
   ...common,
+  resolve: {
+    modules: [sourceDir, "node_modules"],
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+  },
   entry: {
     // We make production.js the first entry so that anything production
     // bootstrapping is done first.
-    dashboard: ["production.ts", "dashboard.ts"],
+    dashboard: ["production.js", "dashboard-aot.js"],
   },
   module: {
     rules: [{
-      test: /\.tsx?$/,
-      loader: "@ngtools/webpack",
+      test: /^.*\.js$/,
+      loader: "ng-router-loader",
+      options: {
+        // Must be true to avoid using the compiler at runtime.
+        aot: true,
+        // Do we need this??
+        bySymbol: false,
+      },
     }, {
       test: /\.(html|css)$/,
       loader: "raw-loader",
@@ -101,22 +105,10 @@ requirejs-local-config}.js",
              },
              context: "build/dev/lib",
            }))]),
-    // This is required when processing JiT code, but we don't want it for AoT,
-    // otherwise the chunks are not created!
-    // new webpack.ContextReplacementPlugin(
-    //   // The (\\|\/) piece accounts for path separators in *nix and Windows
-    //     /angular(\\|\/)core(\\|\/)@angular/,
-    //   path.join(__dirname, "./src")),
-    new AotPlugin({
-      tsConfigPath,
-      entryModule: path.join(__dirname, sourceDir,
-                             "dashboard/app.module#AppModule"),
-      sourceMap: true,
-      compilerOptions: {
-        // We need this off, due to a bug in @angular/compiler-cli.
-        noUnusedParameters: false,
-      },
-    }),
+    new webpack.ContextReplacementPlugin(
+      // The (\\|\/) piece accounts for path separators in *nix and Windows
+        /angular(\\|\/)core(\\|\/)@angular/,
+      path.join(__dirname, "./src")),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
     }),
@@ -130,6 +122,10 @@ requirejs-local-config}.js",
   ],
 }, {
   ...common,
+  resolve: {
+    modules: ["src", "node_modules"],
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+  },
   entry: {
     "dashboard/store": "dashboard/store.ts",
   },
@@ -140,7 +136,7 @@ requirejs-local-config}.js",
         options: {
           transpileOnly: true,
           happyPackMode: true,
-          configFile: tsConfigPath,
+          configFile: "src/tsconfig.json",
           compilerOptions: {
             module: "commonjs",
           },
