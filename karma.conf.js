@@ -92,15 +92,17 @@ module.exports = function configure(config) {
       },
       // transformPath: (path) => path.replace(/\.ts$/, ".js"),
     },
-    reporters: ["progress", "coverage", "remap-coverage"],
+    reporters: ["mocha", "coverage", "karma-remap-istanbul"],
     coverageReporter: {
       type: "in-memory",
     },
-    remapCoverageReporter: {
-      html: "coverage/karma",
-    },
-    remapOptions: {
-      basePath: "src/dashboard/",
+    remapIstanbulReporter: {
+      remapOptions: {
+        // basePath: "src/dashboard/",
+      },
+      reports: {
+        html: "coverage/karma",
+      },
     },
     port: 9876,
     colors: true,
