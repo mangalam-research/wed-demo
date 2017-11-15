@@ -91,7 +91,15 @@ describe("GenericRecordsComponent", () => {
     return fixture.whenStable();
   });
 
-  afterEach(() => db.delete().then(() => db.open()));
+  afterEach(() => {
+    fixture.detectChanges();
+    return fixture.whenStable()
+      .then(() => {
+        fixture.destroy();
+      })
+      .then(() => db.delete())
+      .then(() => db.open());
+  });
 
   describe("#del", () => {
     it("asks for a confirmation", () => {

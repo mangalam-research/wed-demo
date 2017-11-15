@@ -144,7 +144,15 @@ describe("XMLFilesComponent", () => {
     return fixture.whenStable();
   });
 
-  afterEach(() => db.delete().then(() => db.open()));
+  afterEach(() => {
+    fixture.detectChanges();
+    return fixture.whenStable()
+      .then(() => {
+        fixture.destroy();
+      })
+      .then(() => db.delete())
+      .then(() => db.open());
+  });
 
   function makeNavigationURL(record: XMLFile, pack: Pack): string {
     const ls = recordsService.makeIndexedDBURL(record);
