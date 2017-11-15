@@ -1,18 +1,14 @@
 const gulp = require("gulp");
-const gutil = require("gulp-util");
 const gulpNewer = require("gulp-newer");
 const Promise = require("bluebird");
 const path = require("path");
-const es = require("event-stream");
 const requireDir = require("require-dir");
 const eslint = require("gulp-eslint");
-const replace = require("gulp-replace");
 const argparse = require("argparse");
-const gulpTs = require("gulp-typescript");
-const sourcemaps = require("gulp-sourcemaps");
 const config = require("./config");
 const cpp = require("child-process-promise");
-const { del, fs, newer, exec, spawn, mkdirpAsync } = require("./util");
+const { del, fs, newer, exec, execFileAndReport, spawn,
+        mkdirpAsync } = require("./util");
 
 const execFile = cpp.execFile;
 
@@ -60,43 +56,12 @@ const options = config.options = parser.parseArgs(process.argv.slice(2));
 // this allows having code that depends on the configuration values.
 requireDir(".");
 
-const moduleFix = /^(define\(\["require", "exports")(.*?\], function \(require, exports)(.*)$/m;
-function tsc(project) {
-  // The .once nonsense is to work around a gulp-typescript bug
-  //
-  // See: https://github.com/ivogabe/gulp-typescript/issues/295
-  //
-  // For the fix see:
-  // https://github.com/ivogabe/gulp-typescript/issues/295#issuecomment-197299175
-  //
-  const result = project.src()
-        .pipe(sourcemaps.init({ loadMaps: true }))
-        .pipe(project())
-        .once("error", function onError() {
-          this.once("finish", () => {
-            process.exit(1);
-          });
-        });
-
-  const dest = "build/dev/lib";
-  return es.merge(result.js
-                  //
-                  // This ``replace`` to work around the problem that ``module``
-                  // is not defined when compiling to "amd". See:
-                  //
-                  // https://github.com/Microsoft/TypeScript/issues/13591
-                  //
-                  // We need to compile to "amd" for now.
-                  //
-                  .pipe(replace(moduleFix, "$1, \"module\"$2, module$3"))
-                  .pipe(sourcemaps.write("."))
-                  .pipe(gulp.dest(dest)),
-                  result.dts.pipe(gulp.dest(dest)));
+function tsc(tsconfigPath, dest) {
+  return execFileAndReport("./node_modules/.bin/tsc", ["-p", tsconfigPath,
+                                                       "--outDir", dest]);
 }
 
-const project = gulpTs.createProject("src/tsconfig.json");
-// The web part depends on the results of compiling wed.
-gulp.task("tsc", () => tsc(project));
+gulp.task("tsc", () => tsc("src/tsconfig.json", "build/dev/lib"));
 
 gulp.task("copy-package-info", () => {
   const dest = "build/";
@@ -114,16 +79,10 @@ gulp.task("copy-other",
           () => gulp.src(["web/**/*.{js,html,css}", "src/**/*.{js,html,css}"])
           .pipe(gulp.dest("build/dev/lib/")));
 
-gulp.task("build-dev", ["tsc", "copy-other", "copy-package-info"]);
+gulp.task("build-dev", ["tsc", "copy-other"]);
 
-gulp.task("webpack", ["copy-other"], () =>
-          execFile("./node_modules/.bin/webpack", ["--color"])
-          .then((result) => {
-            gutil.log(result.stdout);
-          }, (err) => {
-            gutil.log(err.stdout);
-            throw err;
-          }));
+gulp.task("webpack", ["build-aot-compiled", "copy-other"], () =>
+          execFileAndReport("./node_modules/.bin/webpack", ["--color"]));
 
 gulp.task("build-prod", ["webpack"]);
 

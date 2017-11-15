@@ -7,6 +7,7 @@ const _fs = require("fs-extra");
 const _del = require("del");
 const touch = require("touch");
 const path = require("path");
+const { execFile } = require("child-process-promise");
 
 const fs = Promise.promisifyAll(_fs);
 exports.fs = fs;
@@ -47,19 +48,6 @@ exports.exec = function exec(command, options) {
         reject(err);
       }
       resolve(stdout, stderr);
-    });
-  });
-};
-
-exports.execFile = function execFile(command, args, options) {
-  return new Promise((resolve, reject) => {
-    childProcess.execFile(command, args, options, (err, stdout, stderr) => {
-      if (err) {
-        gutil.log(stdout);
-        gutil.log(stderr);
-        reject(err);
-      }
-      resolve([stdout, stderr]);
     });
   });
 };
@@ -125,4 +113,27 @@ exports.spawn = function spawn(cmd, args, options) {
       resolve();
     });
   });
+};
+
+/**
+ * Why use this over spawn with { stdio: "inherit" }? If you use this function,
+ * the results will be shown in one shot, after the process exits, which may
+ * make things tidier.
+ *
+ * However, not all processes are amenable to this. When running Karma, for
+ * instance, it is desirable to see the progress "live" and so using spawn is
+ * better.
+ */
+exports.execFileAndReport = function execFileAndReport(...args) {
+  return execFile(...args)
+    .then((result) => {
+      if (result.stdout) {
+        gutil.log(result.stdout);
+      }
+    }, (err) => {
+      if (err.stdout) {
+        gutil.log(err.stdout);
+      }
+      throw err;
+    });
 };
