@@ -20,5 +20,10 @@
     "no-import-side-effect": [true,
                               { "ignore-pattern": "^(jquery|bootstrap)$" }]
 
+  },
+  "cliOptions": {
+    "exclude": [
+      "**/*.ngfactory.ts"
+    ]
   }
 }
