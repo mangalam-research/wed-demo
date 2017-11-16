@@ -7,7 +7,7 @@
 
 import { Component, Inject, Optional } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subscription } from "rxjs";
+import { Subscription } from "rxjs/Subscription";
 
 import { ConfirmService } from "../confirm.service";
 import { GenericRecordsComponent } from "../generic-records.component";

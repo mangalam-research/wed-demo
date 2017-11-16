@@ -1,6 +1,7 @@
 import "chai";
 import "chai-as-promised";
 import "mocha";
+import { elementAt } from "rxjs/operators/elementAt";
 
 const expect = chai.expect;
 
@@ -32,7 +33,7 @@ describe("ProcessingService", () => {
     it("emits a change", () => {
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
-      const ret = service.state.elementAt(1).toPromise();
+      const ret = service.state.pipe(elementAt(1)).toPromise();
       service.start(10);
       return expect(ret).to.eventually.deep.equal({ total: 10, count: 0 });
     });
@@ -43,7 +44,7 @@ describe("ProcessingService", () => {
       service.start(10);
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
-      const ret = service.state.elementAt(1).toPromise();
+      const ret = service.state.pipe(elementAt(1)).toPromise();
       service.stop();
       return expect(ret).to.eventually.deep.equal({ total: 0, count: 0 });
     });
@@ -70,7 +71,7 @@ describe("ProcessingService", () => {
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
       async function test(index: number): Promise<void> {
-        const p = service.state.elementAt(1).toPromise();
+        const p = service.state.pipe(elementAt(1)).toPromise();
         service.increment();
         expect(await p).to.deep.equal({ total, count: index });
         if (index < total) {

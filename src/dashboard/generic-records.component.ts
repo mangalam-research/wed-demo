@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subscription } from "rxjs";
+import { Subscription } from "rxjs/Subscription";
 
 import { ConfirmService } from "./confirm.service";
 import { DBService } from "./db.service";

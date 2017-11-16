@@ -2,7 +2,8 @@ import { Location } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Params } from "@angular/router";
-import { Subscription } from "rxjs";
+import { switchMap } from "rxjs/operators/switchMap";
+import { Subscription } from "rxjs/Subscription";
 
 import { NameIdArray, PacksService } from "../packs.service";
 import { updateFormErrors } from "../util";
@@ -41,8 +42,8 @@ export class XMLFileDetailsComponent implements OnInit {
     this.packService.getNameIdArray().then(
       (packs) => this.packs = packs).then(() =>  {
         this.route.params
-          .switchMap((params: Params) =>
-                     this.files.getRecordById(+params["id"]))
+          .pipe(switchMap((params: Params) =>
+                          this.files.getRecordById(+params["id"])))
           .subscribe((record) => {
             if (record === undefined) {
               throw new Error("record does not exist");

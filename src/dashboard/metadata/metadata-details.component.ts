@@ -1,6 +1,7 @@
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Params } from "@angular/router";
+import { switchMap } from "rxjs/operators/switchMap";
 
 import { Metadata } from "../metadata";
 import { MetadataService } from "../metadata.service";
@@ -18,7 +19,8 @@ export class MetadataDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params
-      .switchMap((params: Params) => this.files.getRecordById(+params["id"]))
+      .pipe(switchMap((params: Params) =>
+                      this.files.getRecordById(+params["id"])))
       .subscribe((record) => {
         if (record === undefined) {
           throw new Error("record does not exist");

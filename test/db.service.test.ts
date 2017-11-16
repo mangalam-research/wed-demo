@@ -1,6 +1,7 @@
 import "chai";
 import "chai-as-promised";
 import "mocha";
+import { first } from "rxjs/operators/first";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 
@@ -66,7 +67,7 @@ describe("DBService", () => {
        .then(() => service.getRecords())
        .then((records) => expect(records).to.deep.equal([file]))
        .then(() => {
-         const ret = service.change.first().toPromise();
+         const ret = service.change.pipe(first()).toPromise();
          // It does not matter if the next promise is "lost". We're simulating
          // some other code causing a change.
          service.deleteRecord(file) as {};
@@ -99,7 +100,7 @@ describe("DBService", () => {
 
     it("emits a modification", () =>
        Promise.resolve().then(() => {
-         const ret = service.change.first().toPromise();
+         const ret = service.change.pipe(first()).toPromise();
          // It does not matter if the next promise is "lost". We're simulating
          // some other code causing a change.
          service.updateRecord(file) as {};
@@ -304,7 +305,7 @@ describe("DBService", () => {
 
     it("emits a modification", () =>
        service.updateRecord(file).then(() => {
-         const ret = service.change.first().toPromise();
+         const ret = service.change.pipe(first()).toPromise();
          // It does not matter if the next promise is "lost". We're simulating
          // some other code causing a change.
          service.clear() as {};

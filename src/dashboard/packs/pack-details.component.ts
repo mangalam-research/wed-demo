@@ -2,7 +2,8 @@ import { Location } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Params } from "@angular/router";
-import { Subscription } from "rxjs";
+import { switchMap } from "rxjs/operators/switchMap";
+import { Subscription } from "rxjs/Subscription";
 
 import { MetadataService,
          NameIdArray as MetadataInfoArray } from "../metadata.service";
@@ -59,14 +60,14 @@ export class PackDetailsComponent implements OnInit {
          (metadata) => this.metadata = metadata)])
       .then(() => {
         this.route.params
-          .switchMap((params: Params) => {
+          .pipe(switchMap((params: Params) => {
             const idParam = params["id"];
             if (idParam !== "new") {
               const id = +idParam;
               return this.files.getRecordById(id);
             }
             return Promise.resolve(new Pack(""));
-          })
+          }))
           .subscribe((record) => {
             if (record === undefined) {
               throw new Error(
