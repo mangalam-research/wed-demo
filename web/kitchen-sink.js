@@ -50,6 +50,7 @@ define(function f(require) {
       require(["wed-store"], resolve, reject);
     }).then(function loaded(wedStore) {
       var options = {
+        docURL: "/node_modules/wed/packed/doc/index.html",
         save: {
           path: "wed/savers/indexeddb",
           options: {
