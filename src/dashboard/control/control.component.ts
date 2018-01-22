@@ -26,7 +26,7 @@ export class ControlComponent {
   }
 
   triggerDownload(name: string, data: string): void {
-    triggerDownload(name, data);
+    triggerDownload(name, "application/json", data);
   }
 
   /**

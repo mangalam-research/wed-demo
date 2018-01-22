@@ -36,7 +36,7 @@ GenericRecordsComponent<Pack, PacksService> {
               processing: ProcessingService,
               confirmService: ConfirmService,
               private readonly xmlFiles: XMLFilesService) {
-    super(route, router, files, processing, confirmService);
+    super(route, router, files, processing, confirmService, "application/json");
   }
 
   del(record: Pack): Promise<void> {

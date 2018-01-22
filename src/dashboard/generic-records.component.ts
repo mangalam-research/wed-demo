@@ -16,7 +16,8 @@ RecordService extends DBService<RecordType, number>> {
               protected readonly router: Router,
               protected readonly files: RecordService,
               protected readonly processing: ProcessingService,
-              protected readonly confirmService: ConfirmService) {}
+              protected readonly confirmService: ConfirmService,
+              protected readonly mimeType: string) {}
 
   ngOnInit(): void {
     this.changeSub = this.files.change.subscribe(() => {
@@ -60,7 +61,7 @@ RecordService extends DBService<RecordType, number>> {
   }
 
   protected triggerDownload(name: string, data: string): void {
-    triggerDownload(name, data);
+    triggerDownload(name, this.mimeType, data);
   }
 
   upload(record: RecordType, event: Event): Promise<void> {

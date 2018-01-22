@@ -151,7 +151,7 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
               @Optional() @Inject(XMLTransformService)
               readonly xmlTransforms: XMLTransformService[] | null,
               private readonly packsService: PacksService) {
-    super(route, router, files, processing, confirmService);
+    super(route, router, files, processing, confirmService, "text/xml");
   }
 
   ngOnInit(): void {

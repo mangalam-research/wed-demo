@@ -31,8 +31,9 @@ export function safeConfirm(message: string): Promise<boolean> {
   });
 }
 
-export function triggerDownload(name: string, data: string): void {
-  const file = new window.Blob([data], { type: "text/xml" });
+export function triggerDownload(name: string, mimeType: string,
+                                data: string): void {
+  const file = new window.Blob([data], { type: mimeType });
   // tslint:disable-next-line:strict-boolean-expressions no-any
   const URL = (window as any).webkitURL || window.URL;
   const downloadUrl = URL.createObjectURL(file);

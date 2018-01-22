@@ -31,6 +31,6 @@ GenericRecordsComponent<Schema, SchemasService> {
               files: SchemasService,
               processing: ProcessingService,
               confirmService: ConfirmService) {
-    super(route, router, files, processing, confirmService);
+    super(route, router, files, processing, confirmService, "application/json");
   }
 }

@@ -93,7 +93,7 @@ file a bug report.`));
   }
 
   triggerDownload(name: string, data: string): void {
-    triggerDownload(name, data);
+    triggerDownload(name, "application/json", data);
   }
 
   reload(): void {

@@ -31,6 +31,6 @@ GenericRecordsComponent<Metadata, MetadataService> {
               files: MetadataService,
               processing: ProcessingService,
               confirmService: ConfirmService) {
-    super(route, router, files, processing, confirmService);
+    super(route, router, files, processing, confirmService, "application/json");
   }
 }
