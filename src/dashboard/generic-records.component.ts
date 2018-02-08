@@ -9,8 +9,8 @@ import { triggerDownload } from "./util";
 
 export abstract class GenericRecordsComponent<RecordType extends RecordCommon,
 RecordService extends DBService<RecordType, number>> {
-  records: RecordType[];
-  changeSub: Subscription;
+  records!: RecordType[];
+  changeSub!: Subscription;
 
   constructor(protected readonly route: ActivatedRoute,
               protected readonly router: Router,

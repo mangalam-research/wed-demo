@@ -43,9 +43,9 @@ export interface PackPayload {
 
 export class Pack extends RecordCommon implements PackPayload {
   recordVersion: number = 2;
-  schema: string;
+  schema!: string;
   metadata?: string;
-  mode: string;
+  mode!: string;
   match: MatchSpecification;
 
   constructor(name: string, payload?: PackPayload) {

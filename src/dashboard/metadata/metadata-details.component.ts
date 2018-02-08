@@ -11,7 +11,7 @@ import { MetadataService } from "../metadata.service";
   templateUrl: "./metadata-details.component.html",
 })
 export class MetadataDetailsComponent implements OnInit {
-  file: Metadata;
+  file!: Metadata;
 
   constructor(private files: MetadataService,
               private route: ActivatedRoute,

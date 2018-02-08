@@ -141,7 +141,7 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
   private readonly parser: DOMParser = new DOMParser();
   private cachedEditingData: Record<string, CachedEditingData> =
     Object.create(null);
-  private packsChangeSub: Subscription;
+  private packsChangeSub!: Subscription;
 
   constructor(route: ActivatedRoute,
               router: Router,

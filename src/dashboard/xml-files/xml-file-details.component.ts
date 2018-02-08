@@ -30,7 +30,7 @@ export class XMLFileDetailsComponent implements OnInit {
   };
 
   file: XMLFile | undefined;
-  packs: NameIdArray;
+  packs!: NameIdArray;
 
   constructor(private files: XMLFilesService,
               private packService: PacksService,

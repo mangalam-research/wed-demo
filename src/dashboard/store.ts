@@ -40,11 +40,11 @@ export type AllTables = XMLFilesTable | PackTable | SchemaTable |
   MetadataTable | ChunkTable;
 
 export class Store extends Dexie {
-  xmlfiles: XMLFilesTable;
-  packs: PackTable;
-  schemas: SchemaTable;
-  metadata: MetadataTable;
-  chunks: ChunkTable;
+  xmlfiles!: XMLFilesTable;
+  packs!: PackTable;
+  schemas!: SchemaTable;
+  metadata!: MetadataTable;
+  chunks!: ChunkTable;
 
   constructor() {
     super("wed");

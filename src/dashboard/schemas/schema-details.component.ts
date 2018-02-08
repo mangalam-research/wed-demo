@@ -11,7 +11,7 @@ import { SchemasService } from "../schemas.service";
   templateUrl: "./schema-details.component.html",
 })
 export class SchemaDetailsComponent implements OnInit {
-  file: Schema;
+  file!: Schema;
 
   constructor(private files: SchemasService,
               private route: ActivatedRoute,

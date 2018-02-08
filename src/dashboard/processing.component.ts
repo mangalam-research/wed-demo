@@ -10,24 +10,22 @@ import { ProcessingService } from "./processing.service";
 })
 export class ProcessingComponent {
   @ViewChild("modal")
-  private modalRef: ElementRef;
-  private $modal: JQuery;
-  private progress: HTMLElement;
+  private modalRef!: ElementRef;
 
   constructor(private service: ProcessingService) {}
 
   ngOnInit(): void {
     const element = this.modalRef.nativeElement;
-    this.$modal = $(element);
-    this.progress = element.getElementsByClassName("bar")[0] as HTMLElement;
+    const $modal = $(element);
+    const progress = element.getElementsByClassName("bar")[0] as HTMLElement;
     this.service.state.subscribe(({ total, count }) => {
       if (total === 0) {
-        this.$modal.modal("hide");
+        $modal.modal("hide");
       }
       else {
         const percent = count / total * 100;
-        this.progress.style.width = `${percent}%`;
-        this.$modal.modal("show");
+        progress.style.width = `${percent}%`;
+        $modal.modal("show");
       }
     });
   }

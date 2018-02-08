@@ -38,10 +38,10 @@ export class PackDetailsComponent implements OnInit {
     },
   };
 
-  file: Pack;
-  modes: string[];
-  schemas: SchemaInfoArray;
-  metadata: MetadataInfoArray;
+  file!: Pack;
+  modes!: string[];
+  schemas!: SchemaInfoArray;
+  metadata!: MetadataInfoArray;
 
   constructor(private readonly files: PacksService,
               private readonly modesService: ModesService,

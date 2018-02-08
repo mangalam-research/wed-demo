@@ -5,7 +5,7 @@ import { db } from "./store";
 export abstract class ChunkedRecord extends RecordCommon {
   // tslint:disable-next-line:variable-name
   private __data: Promise<string> | undefined;
-  private savedChunk: string;
+  private savedChunk!: string;
 
   /**
    * Calling code is responsible for ensuring that ``chunk`` already exists in
