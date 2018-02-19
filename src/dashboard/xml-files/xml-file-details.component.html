@@ -9,8 +9,7 @@
     </div>
 
     <label for="pack">Pack: </label>
-    <select name="pack" class="form-control" [(ngModel)]="file.pack"
-            required>
+    <select name="pack" class="form-control" [(ngModel)]="file.pack">
       <option *ngFor="let pack of packs" [ngValue]="pack.id">{{pack.name}}</option>
     </select>
     <div *ngIf="formErrors.pack" class="alert alert-danger">

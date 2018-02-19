@@ -1,36 +1,41 @@
-<div *ngIf="file">
-  <h2>File: {{file.name}}</h2>
-  <form class="form" #form="ngForm" (ngSubmit)="onSubmit($event)">
+<div #container>
+  <form class="form" [formGroup]="form" (ngSubmit)="onSubmit($event)">
     <label for="name">Name: </label>
-    <input name="name" class="form-control" [(ngModel)]="file.name"
+    <input name="name" class="form-control" formControlName="name"
            placeholder="name" required>
-    <div *ngIf="formErrors.name" class="alert alert-danger">
+    <div *ngIf="formErrors.name" class="alert alert-danger name-error">
        {{ formErrors.name }}
     </div>
 
     <label for="mode">Mode: </label>
-    <select name="mode" class="form-control" [(ngModel)]="file.mode"
-            required>
+    <select name="mode" class="form-control" formControlName="mode" required>
       <option *ngFor="let mode of modes" [value]="mode">{{mode}}</option>
     </select>
-    <div *ngIf="formErrors.mode" class="alert alert-danger">
+    <div *ngIf="formErrors.mode" class="alert alert-danger mode-error">
        {{ formErrors.mode }}
     </div>
 
-    <label for="schema">Schema: </label>
-    <select name="schema" class="form-control" [(ngModel)]="file.schema"
-            required>
-      <option *ngFor="let schema of schemas" [value]="schema.id">{{schema.name}}</option>
-    </select>
-    <div *ngIf="formErrors.schema" class="alert alert-danger">
+    <button class="btn btn-default set-schema" (click)="setSchema()"
+            type="button">Set Schema</button>
+    <button class="btn btn-default clear-schema" (click)="clearSchema()"
+            [disabled]="!(hasSchema() | async)"
+            type="button">Clear Schema</button>
+    <button class="btn btn-default view-schema" (click)="viewSchema()"
+            [disabled]="!(hasSchema() | async)"
+            type="button">View Schema</button>
+    <div *ngIf="formErrors.schema" class="alert alert-danger schema-error">
        {{ formErrors.schema }}
     </div>
-
-    <label for="metadata">Metadata: </label>
-    <select name="metadata" class="form-control" [(ngModel)]="file.metadata">
-      <option *ngFor="let m of metadata" [value]="m.id">{{m.name}}</option>
-    </select>
-    <div *ngIf="formErrors.metadata" class="alert alert-danger">
+    <br>
+    <button class="btn btn-default set-metadata" (click)="setMetadata()"
+            type="button">Set Metadata</button>
+    <button class="btn btn-default clear-metadata" (click)="clearMetadata()"
+            [disabled]="!(hasMetadata() | async)"
+            type="button">Clear Schema</button>
+    <button class="btn btn-default view-metadata" (click)="viewMetadata()"
+            [disabled]="!(hasMetadata() | async)"
+            type="button">View Metadata</button>
+    <div *ngIf="formErrors.metadata" class="alert alert-danger metadata-error">
        {{ formErrors.metadata }}
     </div>
 
@@ -39,29 +44,31 @@
       this application performs by default.
     </p>
 
-    <label for="matchLocalName">Match local name: </label>
-    <input name="matchLocalName" class="form-control" [(ngModel)]="file.match.localName"
-           placeholder="local name">
-    <div *ngIf="formErrors.matchLocalName" class="alert alert-danger">
-       {{ formErrors.matchLocalName }}
-    </div>
+    <div formGroupName="match">
+      <label for="matchLocalName">Match local name: </label>
+      <input name="matchLocalName" class="form-control"
+             formControlName="localName" placeholder="local name">
+      <div *ngIf="formErrors.matchLocalName" class="alert alert-danger matchLocalName-error">
+        {{ formErrors.matchLocalName }}
+      </div>
 
-    <label for="matchNamespaceURI">Match namespace URI: </label>
-    <input name="matchNamespaceURI" class="form-control" [(ngModel)]="file.match.namespaceURI"
-           placeholder="URI">
-    <div *ngIf="formErrors.matchNamespaceURI" class="alert alert-danger">
-       {{ formErrors.matchNamespaceURI }}
+      <label for="matchNamespaceURI">Match namespace URI: </label>
+      <input name="matchNamespaceURI" class="form-control"
+             formControlName="namespaceURI" placeholder="URI">
+      <div *ngIf="formErrors.matchNamespaceURI" class="alert alert-danger matchNamespaceURI-error">
+        {{ formErrors.matchNamespaceURI }}
+      </div>
     </div>
 
     <hr>
     <label for="uploaded">Last uploaded: </label>
-    <input name="uploaded" class="form-control"
-           [ngModel]="file.uploaded.toLocaleString()" readonly="true">
+    <input name="uploaded" class="form-control" formControlName="uploaded"
+           readonly="true">
     <label for="downloaded">Last downloaded: </label>
-    <input name="downloaded" class="form-control"
-           [ngModel]="file.downloaded.toLocaleString()" readonly="true">
+    <input name="downloaded" class="form-control" formControlName="downloaded"
+           readonly="true">
     <button class="btn btn-default" type="submit"
             [disabled]="!form.valid">Save</button>
   </form>
-  <button class="btn btn-default" (click)="goBack()">Back</button>
+  <button class="btn btn-default" (click)="goBack()" type="button">Back</button>
 </div>

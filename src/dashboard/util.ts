@@ -5,7 +5,7 @@
  * @copyright Mangalam Research Center for Buddhist Languages
  */
 
-import { NgForm } from "@angular/forms";
+import { FormGroup, NgForm } from "@angular/forms";
 import * as bootbox from "bootbox";
 
 import { readFile } from "./store-util";
@@ -80,31 +80,31 @@ export function filesEqual(a: File, b: File): Promise<boolean> {
 export type FormErrors = {[name: string]: string };
 export type ValidationMessages = {[name: string]: {[name: string]: string}};
 
-export function updateFormErrors(ngForm: NgForm,
+export function updateFormErrors(ngForm: NgForm | FormGroup,
                                  formErrors: FormErrors,
                                  validationMessages: ValidationMessages): void {
-  const form = ngForm.form;
+  const form = ngForm instanceof FormGroup ? ngForm : ngForm.form;
 
-  /* tslint:disable:forin */
-  for (const field in formErrors) {
-    // clear previous error message (if any)
-    formErrors[field] = "";
-    const control = form.get(field);
+  for (const fieldName of Object.keys(form.controls)) {
+    // Clear previous errors.
+    formErrors[fieldName] = "";
 
-    if (control != null && control.dirty && !control.valid) {
-      const messages = validationMessages[field];
+    const control = form.controls[fieldName];
+    if (control != null && !control.disabled && control.dirty &&
+        control.invalid) {
+      const messages = validationMessages[fieldName];
       const errors = control.errors;
 
       if (errors === null) {
-        throw new Error("control is invalid but has no errors");
+        throw new Error(`control is invalid but has no errors: ${fieldName}`);
       }
 
+      // tslint:disable-next-line:forin
       for (const key in errors) {
-        formErrors[field] += `${messages[key]} `;
+        formErrors[fieldName] += `${messages[key]} `;
       }
     }
   }
-  /* tslint:enable:forin */
 }
 
 /**

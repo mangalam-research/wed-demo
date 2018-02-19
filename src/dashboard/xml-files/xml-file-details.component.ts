@@ -24,9 +24,6 @@ export class XMLFileDetailsComponent implements OnInit {
     name: {
       required: "Name is required.",
     },
-    pack: {
-      required: "Pack is required.",
-    },
   };
 
   file: XMLFile | undefined;

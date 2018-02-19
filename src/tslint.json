@@ -18,8 +18,8 @@
                           "https://github.com/palantir/tslint/issues/1257"],
     "newline-before-return": [false, "Not for this project."],
     "no-import-side-effect": [true,
-                              { "ignore-pattern": "^(jquery|bootstrap)$" }]
-
+                              { "ignore-pattern": "^(jquery|bootstrap)$" }],
+    "no-backbone-get-set-outside-model": [false, "No backbone in this project."]
   },
   "cliOptions": {
     "exclude": [

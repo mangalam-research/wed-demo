@@ -1,0 +1,26 @@
+<div #modal class="modal" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1>Select one {{title}}</h1>
+      </div>
+      <div class="modal-body">
+        <form class="form" #form="ngForm">
+          <label for="schema">{{title}}: </label>
+          <select name="schema" class="form-control" [(ngModel)]="selected"
+                  required>
+            <option *ngFor="let choice of choices"
+                    [value]="choice.id">{{choice.name}}</option>
+          </select>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default btn-primary" data-dismiss="modal"
+                type="button" (click)="onButtonClicked('ok')"
+                [disabled]="selected === undefined">Ok</button>
+        <button class="btn btn-default" data-dismiss="modal" type ="button"
+                (click)="onButtonClicked('cancel')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
