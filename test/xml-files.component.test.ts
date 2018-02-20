@@ -291,7 +291,7 @@ describe("XMLFilesComponent", () => {
         const record = await recordsService.getRecordByName("a");
         return expect(component.getEditingData(record!).editButtonTitle
                       .pipe(first()).toPromise())
-          .to.eventually.equal("Edit");
+          .to.eventually.equal("Edit with pack foo");
       });
     });
 
@@ -352,7 +352,7 @@ describe("XMLFilesComponent", () => {
         expect(editButton.getAttribute("title"))
           .to.equal(shouldBeDisabled ?
                     "This file needs a pack before editing." :
-                    "Edit");
+                    "Edit with pack foo");
         recordIndex++;
       }
 

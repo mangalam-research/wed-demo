@@ -102,8 +102,9 @@ export class CachedEditingData {
    * The title to give to the edit button.
    */
   readonly editButtonTitle: Observable<string> =
-    this.editable.pipe(map((editable) => editable ? "Edit" :
-                           "This file needs a pack before editing."));
+    this.associatedPack.pipe(map((pack) => pack !== undefined ?
+                                 `Edit with pack ${pack.name}` :
+                                 "This file needs a pack before editing."));
 
   /**
    * @param record The file for which we are caching editing data.
