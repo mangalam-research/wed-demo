@@ -13,6 +13,7 @@ import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { RouterTestingModule } from "@angular/router/testing";
+import { first } from "rxjs/operators/first";
 
 import { db } from "dashboard/store";
 
@@ -246,77 +247,66 @@ describe("XMLFilesComponent", () => {
   });
 
   describe("#getEditingData()", () => {
-    function isCached(fn: Function): void {
-      expect(fn()).to.equal(fn());
-    }
-
     describe("#editable", () => {
       it("returns false when the record has nopack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editable())
+        return expect(component.getEditingData(record!).editable
+                      .pipe(first()).toPromise())
           .to.eventually.be.false;
       });
 
       it("returns true when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editable())
+        return expect(component.getEditingData(record!).editable
+                      .pipe(first()).toPromise())
           .to.eventually.be.true;
-      });
-
-      it("caches its promise", async () => {
-        const record = await recordsService.getRecordByName("a");
-        isCached(() => component.getEditingData(record!).editable());
       });
     });
 
     describe("#editingDisabled", () => {
       it("returns an empty string when the record has nopack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editingDisabled())
+        return expect(component.getEditingData(record!).editingDisabled
+                      .pipe(first()).toPromise())
           .to.eventually.equal("");
       });
 
       it("returns ``null`` when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editingDisabled())
+        return expect(component.getEditingData(record!).editingDisabled
+                      .pipe(first()).toPromise())
           .to.eventually.be.null;
-      });
-
-      it("caches its promise", async () => {
-        const record = await recordsService.getRecordByName("a");
-        isCached(() => component.getEditingData(record!).editingDisabled());
       });
     });
 
     describe("#editButtonTitle", () => {
       it("returns the correct title when the record has no pack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editButtonTitle())
+        return expect(component.getEditingData(record!).editButtonTitle
+                      .pipe(first()).toPromise())
           .to.eventually.equal("This file needs a pack before editing.");
       });
 
       it("returns the correct title when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editButtonTitle())
+        return expect(component.getEditingData(record!).editButtonTitle
+                      .pipe(first()).toPromise())
           .to.eventually.equal("Edit");
-      });
-
-      it("caches its promise", async () => {
-        const record = await recordsService.getRecordByName("a");
-        isCached(() => component.getEditingData(record!).editButtonTitle());
       });
     });
 
     describe("#getPack", () => {
       it("returns undefined the record has no pack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).getPack())
+        return expect(component.getEditingData(record!).associatedPack
+                      .pipe(first()).toPromise())
           .to.eventually.be.undefined;
       });
 
       it("returns the pack when the record has a manual pack", async () => {
         const record = (await recordsService.getRecordByName("a"))!;
-        expect((await component.getEditingData(record).getPack())!.id)
+        expect((await component.getEditingData(record).associatedPack
+                .pipe(first()).toPromise())!.id)
           .to.equal(record.pack);
       });
     });
@@ -348,7 +338,8 @@ describe("XMLFilesComponent", () => {
         const editButton = tr.querySelector(".btn.edit-button")!;
         const record = component.records[recordIndex];
         const shouldBeDisabled =
-          (await component.getEditingData(record).getPack()) === undefined;
+          (await component.getEditingData(record).
+           associatedPack.pipe(first()).toPromise()) === undefined;
 
         if (shouldBeDisabled) {
           sawDisabled++;

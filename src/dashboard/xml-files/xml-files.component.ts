@@ -7,7 +7,12 @@
 
 import { Component, Inject, Optional } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subscription } from "rxjs/Subscription";
+import { Observable } from "rxjs/Observable";
+import { concat } from "rxjs/observable/concat";
+import { from } from "rxjs/observable/from";
+import { concatMap } from "rxjs/operators/concatMap";
+import { first } from "rxjs/operators/first";
+import { map } from "rxjs/operators/map";
 
 import { ConfirmService } from "../confirm.service";
 import { GenericRecordsComponent } from "../generic-records.component";
@@ -26,9 +31,79 @@ import { XMLTransformService } from "../xml-transform.service";
  * amounts to a change in the data modeled.
  */
 export class CachedEditingData {
-  private _editingDisabled?: Promise<null | string>;
-  private _editable?: Promise<boolean>;
-  private _editButtonTitle?: Promise<string>;
+
+  private _top?: Element | null;
+
+  /**
+   * Get the top element of the document. We cache this information because a
+   * [[CachedEditingData]] object is recreated whenever the XML Files database
+   * changes in any way.
+   */
+  private async getTop(): Promise<Element | null> {
+    if (this._top === undefined) {
+      const data = await this.record.getData();
+      const doc = this.parser.parseFromString(data, "text/xml");
+      this._top = doc.firstElementChild;
+    }
+
+    return this._top;
+  }
+
+  /** The pack automatically associated with the file. */
+  readonly automaticPack: Observable<Pack | undefined>  =
+    this.packsObservable.pipe(concatMap(async () => {
+      const top = await this.getTop();
+      if (top === null) {
+        return undefined;
+      }
+
+      const localName = top.tagName;
+      let namespaceURI = top.namespaceURI;
+      if (namespaceURI === null) {
+        namespaceURI = "";
+      }
+
+      return this.packsService.matchWithPack(localName, namespaceURI);
+    }));
+
+  /** The pack manually or automatically associated with the file. */
+  readonly associatedPack: Observable<Pack | undefined> =
+    this.packsObservable.pipe(concatMap(async () => {
+      if (this.record.pack !== undefined) {
+        const pack = await this.packsService.getRecordById(this.record.pack);
+        if (pack === undefined) {
+          throw new Error(`cannot load pack: ${this.record.pack}`);
+        }
+
+        return pack;
+      }
+
+      // The pipe and toPromise rigmarole is because this function being async
+      // would cause the return to return a promise of an observable, which rxjs
+      // does not unwrap to just an observable :-/
+      return this.automaticPack.pipe(first()).toPromise();
+    }));
+
+  /**
+   * Whether the file is editable or not. It is editable if it has a pack
+   * manually or automatically associated with it.
+   */
+  readonly editable: Observable<boolean> =
+    this.associatedPack.pipe(map((pack) => pack !== undefined));
+
+  /**
+   * A value appropriate for ``x`` in ``setAttribute("disabled", x)``. We use
+   * this to disable the editing button.
+   */
+  readonly editingDisabled: Observable<null | string> =
+    this.editable.pipe(map((editable) => editable ? null : ""));
+
+  /**
+   * The title to give to the edit button.
+   */
+  readonly editButtonTitle: Observable<string> =
+    this.editable.pipe(map((editable) => editable ? "Edit" :
+                           "This file needs a pack before editing."));
 
   /**
    * @param record The file for which we are caching editing data.
@@ -42,89 +117,13 @@ export class CachedEditingData {
               private readonly parser: DOMParser) {}
 
   /**
-   * @returns A promise resolving to whether the file is editable or not. It is
-   * editable if it has a pack manually or automatically associated with it.
+   * ``this.packsService.change`` is a ``Subject`` and so will not emit a value
+   * until a change happens in the database. The observable produced here will
+   * immediately emit a single event and then wait.
    */
-  editable(): Promise<boolean> {
-    if (this._editable === undefined) {
-      this._editable = Promise.resolve()
-        .then(() => this.getPack())
-        .then((pack) => pack !== undefined);
-    }
-
-    return this._editable;
+  private get packsObservable(): Observable<void> {
+    return concat(from([undefined]), this.packsService.change);
   }
-
-  /**
-   * @returns A promise resolving to a value appropriate for ``x`` in
-   * ``setAttribute("disabled", x)``. We use this to disable the editing button.
-   */
-  editingDisabled(): Promise<null | string> {
-    if (this._editingDisabled === undefined) {
-      this._editingDisabled = this.editable()
-        .then((editable) => editable ? null : "");
-    }
-
-    return this._editingDisabled;
-  }
-
-  /**
-   * @returns A promise resolving to the title to give to the edit button.
-   */
-  editButtonTitle(): Promise<string> {
-    if (this._editButtonTitle === undefined) {
-      this._editButtonTitle = this.editable()
-        .then((editable) => editable ? "Edit" :
-              "This file needs a pack before editing.");
-    }
-
-    return this._editButtonTitle;
-  }
-  /**
-   * @returns A promise resolving to a pack manually or automatically associated
-   * with the file. **THE RETURN VALUE IS NOT CACHED**.
-   */
-  getPack(): Promise<Pack | undefined> {
-    return Promise.resolve()
-      .then(() => {
-        if (this.record.pack !== undefined) {
-          return this.packsService.getRecordById(this.record.pack)
-            .then((pack) => {
-              if (pack === undefined) {
-                throw new Error(`cannot load pack: ${this.record.pack}`);
-              }
-
-              return pack;
-            });
-        }
-
-        return this.findPack();
-      });
-  }
-
-  /**
-   * @returns A promise resolving to a pack automatically associated with the
-   * file. **THE RETURN VALUE IS NOT CACHED**.
-   */
-  findPack(): Promise<Pack | undefined> {
-    return this.record.getData()
-      .then((data) => {
-        const doc = this.parser.parseFromString(data, "text/xml");
-        const top = doc.firstElementChild;
-        if (top === null) {
-          return undefined;
-        }
-
-        const localName = top.tagName;
-        let namespaceURI = top.namespaceURI;
-        if (namespaceURI === null) {
-          namespaceURI = "";
-        }
-
-        return this.packsService.matchWithPack(localName, namespaceURI);
-      });
-  }
-
 }
 
 @Component({
@@ -141,7 +140,6 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
   private readonly parser: DOMParser = new DOMParser();
   private cachedEditingData: Record<string, CachedEditingData> =
     Object.create(null);
-  private packsChangeSub!: Subscription;
 
   constructor(route: ActivatedRoute,
               router: Router,
@@ -154,19 +152,9 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
     super(route, router, files, processing, confirmService, "text/xml");
   }
 
-  ngOnInit(): void {
-    super.ngOnInit();
-
-    // We also want to clear our editing data and refresh when packs are
-    // modified, deleted or added.
-    this.packsChangeSub = this.packsService.change.subscribe(() => {
-      this.cachedEditingData = Object.create(null);
-      this.refresh();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.packsChangeSub.unsubscribe();
+  protected refresh(): void {
+    this.cachedEditingData = Object.create(null);
+    super.refresh();
   }
 
   /**
@@ -195,19 +183,21 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
    *
    * @returns A promise that resolves once launching the editing task is done.
    */
-  edit(record: XMLFile): Promise<void> {
+  async edit(record: XMLFile): Promise<void> {
     const base = "../kitchen-sink.html?nodemo=1&localstorage=";
-    return this.getEditingData(record).getPack().then((pack) => {
-      if (pack === undefined) {
-        throw new Error(`edit launched on file without a pack associated \
+    const pack = await this.getEditingData(record).associatedPack.pipe(first())
+      .toPromise();
+
+    if (pack === undefined) {
+      throw new Error(`edit launched on file without a pack associated \
 with it manually or automatically`);
-      }
-      const here = window.location.href;
-      const fileUrl = this.files.makeIndexedDBURL(record);
-      const packUrl = this.packsService.makeIndexedDBURL(pack);
-      const url = `${base}${fileUrl}&pack=${packUrl}&management=${here}`;
-      this.goTo(url);
-    });
+    }
+
+    const here = window.location.href;
+    const fileUrl = this.files.makeIndexedDBURL(record);
+    const packUrl = this.packsService.makeIndexedDBURL(pack);
+    const url = `${base}${fileUrl}&pack=${packUrl}&management=${here}`;
+    this.goTo(url);
   }
 
   private goTo(url: string): void {
