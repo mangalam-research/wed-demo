@@ -165,15 +165,12 @@ extends GenericRecordsComponent<XMLFile, XMLFilesService> {
    * @returns A promise that resolves once the download has been launched and
    * the record updated with the new download date.
    */
-  download(record: XMLFile): Promise<void> {
-    return super.download(record).then(() => {
-      // We update the last time it was downloaded. We do not detect whether the
-      // download was cancelled. Not sure we *could*, even...
-      record.downloaded = new Date();
-      return this.files.updateRecord(record)
-      // Make sure we don't return anything.
-        .then(() => { return; });
-    });
+  async download(record: XMLFile): Promise<void> {
+    await super.download(record);
+    // We update the last time it was downloaded. We do not detect whether the
+    // download was cancelled. Not sure we *could*, even...
+    record.downloaded = new Date();
+    await this.files.updateRecord(record);
   }
 
   /**
@@ -227,30 +224,25 @@ with it manually or automatically`);
    * @returns A promise that resolves once the operation is done (either because
    * the new file was created or because the operation was cancelled).
    */
-  newFile(): Promise<void> {
-    return this.confirmService.prompt("Give a name to your new file")
-      .then((name) => {
-        if (name === "") {
-          return;
-        }
+  async newFile(): Promise<void> {
+    const name =
+      await this.confirmService.prompt("Give a name to your new file");
 
-        return this.files.writeCheck(name, this.confirmService.confirm)
-          .then(({ write, record }) => {
-            if (!write) {
-              return;
-            }
+    if (name === "") {
+      return;
+    }
 
-            return this.files.makeRecord(name, "")
-              .then((newRecord) => {
-                if (record !== null) {
-                  newRecord.id = record.id;
-                }
+    const { write, record } =
+      await this.files.writeCheck(name, this.confirmService.confirm);
+    if (!write) {
+      return;
+    }
 
-                return this.files.updateRecord(newRecord)
-                // Void the return value.
-                  .then(() => { return; });
-              });
-          });
-      });
+    const newRecord = await this.files.makeRecord(name, "");
+    if (record !== null) {
+      newRecord.id = record.id;
+    }
+
+    await this.files.updateRecord(newRecord);
   }
 }
