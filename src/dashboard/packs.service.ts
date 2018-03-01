@@ -10,7 +10,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { defer } from "rxjs/observable/defer";
 import { concatMap } from "rxjs/operators/concatMap";
-import { BaseName, constructTree, Event } from "salve";
+import { BaseName, constructTree, Event, Grammar } from "salve";
 
 import { Chunk } from "./chunk";
 import { ChunksService } from "./chunks.service";
@@ -37,6 +37,7 @@ function addToMatchingData(data: MatchingData, key: string, id: number): void {
 @Injectable()
 export class PacksService extends DBService<Pack, number> {
   private readonly matchingData: Observable<MatchingData>;
+  private readonly grammarCache: Record<string, Grammar> = Object.create(null);
 
   constructor(private readonly chunksService: ChunksService) {
     super(db.packs);
@@ -54,6 +55,18 @@ export class PacksService extends DBService<Pack, number> {
     });
   }
 
+  private async getGrammarForSchema(id: string): Promise<Grammar> {
+    let grammar = this.grammarCache[id];
+    if (grammar === undefined) {
+      // tslint:disable-next-line:no-non-null-assertion
+      const schemaChunk = (await this.chunksService.getRecordById(id))!;
+      const schema = await schemaChunk.getData();
+      grammar = this.grammarCache[id] = constructTree(schema);
+    }
+
+    return grammar;
+  }
+
   private async makeMatchingData(): Promise<MatchingData> {
     const packs = await this.getRecords();
     const data: MatchingData = Object.create(null);
@@ -63,11 +76,7 @@ export class PacksService extends DBService<Pack, number> {
       const id = pack.id!;
       const { localName, namespaceURI } = pack.match;
       if (localName === "") {
-        // tslint:disable-next-line:no-non-null-assertion
-        const schemaChunk = (await this.chunksService.getRecordById(schemaID))!;
-        const schema = await schemaChunk.getData();
-        const grammar = constructTree(schema);
-        const walker = grammar.newWalker();
+        const walker = (await this.getGrammarForSchema(schemaID)).newWalker();
         const possible: Event[] = walker.possible().toArray();
         for (const event of possible) {
           if (event.params[0] === "enterStartTag") {
@@ -76,15 +85,14 @@ export class PacksService extends DBService<Pack, number> {
             // We only work with simple patterns that match exactly one name.
             const names = name.toArray();
             if (names !== null && names.length === 1) {
-              const key = makeMatchKey(names[0].name, names[0].ns);
-              addToMatchingData(data, key, id);
+              addToMatchingData(data, makeMatchKey(names[0].name, names[0].ns),
+                                id);
             }
           }
         }
       }
       else {
-        const key = makeMatchKey(localName, namespaceURI);
-        addToMatchingData(data, key, id);
+        addToMatchingData(data, makeMatchKey(localName, namespaceURI), id);
       }
     }
 

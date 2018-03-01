@@ -13,6 +13,7 @@ import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { RouterTestingModule } from "@angular/router/testing";
+import { elementAt } from "rxjs/operators/elementAt";
 import { first } from "rxjs/operators/first";
 
 import { db } from "dashboard/store";
@@ -264,18 +265,20 @@ describe("XMLFilesComponent", () => {
     });
 
     describe("#editingDisabled", () => {
+      // We have to use elementAt for these tests because .editingDisabled
+      // always starts with a value of "" and does not get to its "real" value
+      // until some async functions have completed executing, which brings a
+      // second value, which is the one we want to use.
       it("returns an empty string when the record has nopack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editingDisabled
-                      .pipe(first()).toPromise())
-          .to.eventually.equal("");
+        expect(await component.getEditingData(record!)
+               .editingDisabled.pipe(elementAt(1)).toPromise()).to.equal("");
       });
 
       it("returns ``null`` when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editingDisabled
-                      .pipe(first()).toPromise())
-          .to.eventually.be.null;
+        expect(await component.getEditingData(record!)
+               .editingDisabled.pipe(elementAt(1)).toPromise()).to.be.null;
       });
     });
 

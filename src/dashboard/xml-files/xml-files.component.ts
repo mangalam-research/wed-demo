@@ -13,6 +13,7 @@ import { from } from "rxjs/observable/from";
 import { concatMap } from "rxjs/operators/concatMap";
 import { first } from "rxjs/operators/first";
 import { map } from "rxjs/operators/map";
+import { startWith } from "rxjs/operators/startWith";
 
 import { ConfirmService } from "../confirm.service";
 import { GenericRecordsComponent } from "../generic-records.component";
@@ -25,19 +26,18 @@ import { XMLTransformService } from "../xml-transform.service";
 
 /**
  * This class records data that we need to build the rows of the files
- * table. Some of the information needed is asynchronous and thus must be
- * obtained through promises. We must cache the promises that are used by the
- * GUI because the way Angular works, if a new promise is returned, then this
- * amounts to a change in the data modeled.
+ * table. Some of the information needed is asynchronous. We must cache the
+ * observables that are used by the GUI because the way Angular works, if a new
+ * observable is returned, then this amounts to a change in the data modeled.
  */
-export class CachedEditingData {
+export class EditingData {
 
   private _top?: Element | null;
 
   /**
-   * Get the top element of the document. We cache this information because a
-   * [[CachedEditingData]] object is recreated whenever the XML Files database
-   * changes in any way.
+   * Get the top element of the document. We cache this information because an
+   * [[EditingData]] object is recreated whenever the XML Files database changes
+   * in any way.
    */
   private async getTop(): Promise<Element | null> {
     if (this._top === undefined) {
@@ -93,7 +93,9 @@ export class CachedEditingData {
    * this to disable the editing button.
    */
   readonly editingDisabled: Observable<null | string> =
-    this.editable.pipe(map((editable) => editable ? null : ""));
+    this.editable.pipe(map((editable) => editable ? null : ""),
+                       // Cast necessary to please TS...
+                       startWith("" as string | null));
 
   /**
    * The title to give to the edit button.
@@ -127,7 +129,7 @@ export class CachedEditingData {
 export class XMLFilesComponent
 extends GenericRecordsComponent<XMLFile, XMLFilesService> {
   private readonly parser: DOMParser = new DOMParser();
-  private cachedEditingData: Record<string, CachedEditingData> =
+  private cachedEditingData: Record<string, EditingData> =
     Object.create(null);
 
   constructor(route: ActivatedRoute,
@@ -195,15 +197,23 @@ with it manually or automatically`);
    *
    * @returns The editing data.
    */
-  getEditingData(record: XMLFile): CachedEditingData {
+  getEditingData(record: XMLFile): EditingData {
     const key = String(record.id);
     if (!(key in this.cachedEditingData)) {
-      this.cachedEditingData[key] = new CachedEditingData(record,
-                                                          this.packsService,
-                                                          this.parser);
+      this.cachedEditingData[key] = new EditingData(record,
+                                                    this.packsService,
+                                                    this.parser);
     }
 
     return this.cachedEditingData[key];
+  }
+
+  editButtonDisabledValue(record: XMLFile): Observable<string | null> {
+    return this.getEditingData(record).editingDisabled;
+  }
+
+  editButtonTitle(record: XMLFile): Observable<string> {
+    return this.getEditingData(record).editButtonTitle;
   }
 
   /**
