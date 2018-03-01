@@ -8,7 +8,7 @@
 import { Component, Inject, Optional } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Observable } from "rxjs/Observable";
-import { concat } from "rxjs/observable/concat";
+import { defer } from "rxjs/observable/defer";
 import { from } from "rxjs/observable/from";
 import { concatMap } from "rxjs/operators/concatMap";
 import { first } from "rxjs/operators/first";
@@ -51,10 +51,9 @@ export class CachedEditingData {
 
   /** The pack automatically associated with the file. */
   readonly automaticPack: Observable<Pack | undefined>  =
-    this.packsObservable.pipe(concatMap(async () => {
-      const top = await this.getTop();
+    defer(() => this.getTop()).pipe(concatMap((top) => {
       if (top === null) {
-        return undefined;
+        return from([undefined]);
       }
 
       const localName = top.tagName;
@@ -63,26 +62,24 @@ export class CachedEditingData {
         namespaceURI = "";
       }
 
-      return this.packsService.matchWithPack(localName, namespaceURI);
+      return this.packsService.getMatchObservable(localName, namespaceURI);
     }));
 
   /** The pack manually or automatically associated with the file. */
   readonly associatedPack: Observable<Pack | undefined> =
-    this.packsObservable.pipe(concatMap(async () => {
-      if (this.record.pack !== undefined) {
-        const pack = await this.packsService.getRecordById(this.record.pack);
-        if (pack === undefined) {
-          throw new Error(`cannot load pack: ${this.record.pack}`);
-        }
-
-        return pack;
+    defer(async () => {
+      if (this.record.pack === undefined) {
+        return undefined;
       }
 
-      // The pipe and toPromise rigmarole is because this function being async
-      // would cause the return to return a promise of an observable, which rxjs
-      // does not unwrap to just an observable :-/
-      return this.automaticPack.pipe(first()).toPromise();
-    }));
+      const pack = await this.packsService.getRecordById(this.record.pack);
+      if (pack === undefined) {
+        throw new Error(`cannot load pack: ${this.record.pack}`);
+      }
+
+      return pack;
+    }).pipe(concatMap((pack) => (pack !== undefined ? from([pack]) :
+                                 this.automaticPack)));
 
   /**
    * Whether the file is editable or not. It is editable if it has a pack
@@ -116,15 +113,6 @@ export class CachedEditingData {
   constructor(private readonly record: XMLFile,
               private readonly packsService: PacksService,
               private readonly parser: DOMParser) {}
-
-  /**
-   * ``this.packsService.change`` is a ``Subject`` and so will not emit a value
-   * until a change happens in the database. The observable produced here will
-   * immediately emit a single event and then wait.
-   */
-  private get packsObservable(): Observable<void> {
-    return concat(from([undefined]), this.packsService.change);
-  }
 }
 
 @Component({

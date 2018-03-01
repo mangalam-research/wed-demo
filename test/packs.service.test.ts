@@ -2,6 +2,8 @@ import "chai";
 import "chai-as-promised";
 import "mocha";
 
+import { first } from "rxjs/operators/first";
+
 chai.config.truncateThreshold = 0;
 const expect = chai.expect;
 
@@ -84,33 +86,33 @@ describe("PacksService", () => {
               .then((chunk) => chunk!.getData())).to.eventually.equal(schema));
   });
 
-  describe("#matchWithPack", () => {
-    it("returns undefined if nothing matches", async () => {
-      expect(await service.matchWithPack("moo", "")).to.be.undefined;
-      expect(await service.matchWithPack("b", "moouri")).to.be.undefined;
+  describe("#getMatchObservable returns an observable that", () => {
+    it("produces undefined if nothing matches", async () => {
+      expect(await service.getMatchObservable("moo", "").pipe(first())
+             .toPromise()).to.be.undefined;
+      expect(await service.getMatchObservable("b", "moouri").pipe(first())
+             .toPromise()).to.be.undefined;
     });
 
-    it("matches automatically if there is no explicit match set", () =>
-       expect(service.matchWithPack("doc",
-                                    // tslint:disable-next-line:no-http-string
-                                    "http://mangalamresearch.org/ns/mmwp/doc"))
-       .to.eventually.have.property("id").equal(files["foo"].id));
+    it("matches automatically if there is no explicit match set", async () =>
+       expect(await service.
+              getMatchObservable("doc",
+                                 // tslint:disable-next-line:no-http-string
+                                 "http://mangalamresearch.org/ns/mmwp/doc")
+              .pipe(first()).toPromise())
+       .to.have.property("id").equal(files["foo"].id));
 
     it("matches automatically if there is an explicit match set", () =>
-       expect(service.matchWithPack("moo", "moouri"))
+       expect(service.getMatchObservable("moo", "moouri").pipe(first())
+              .toPromise())
        .to.eventually.have.property("id").equal(files["moo"].id));
 
     it("adjusts when packs are modified", async () => {
-      const pack = await service.matchWithPack("moo", "moouri");
+      const observable = service.getMatchObservable("moo", "moouri");
+      const pack = await observable.pipe(first()).toPromise();
       expect(pack).to.not.be.undefined;
-      // We test _matchingData to make sure it is created...
-      // tslint:disable-next-line:no-any
-      expect((service as any)._matchingData).to.not.be.undefined;
       await service.deleteRecord(pack!);
-      // And flushed when a pack is deleted.
-      // tslint:disable-next-line:no-any
-      expect((service as any)._matchingData).to.be.undefined;
-      const packAgain = await service.matchWithPack("moo", "moouri");
+      const packAgain = await observable.pipe(first()).toPromise();
       expect(packAgain).to.be.undefined;
     });
   });

@@ -7,6 +7,9 @@
 "use strict";
 
 import { Injectable } from "@angular/core";
+import { Observable } from "rxjs/Observable";
+import { defer } from "rxjs/observable/defer";
+import { concatMap } from "rxjs/operators/concatMap";
 import { BaseName, constructTree, Event } from "salve";
 
 import { Chunk } from "./chunk";
@@ -33,75 +36,81 @@ function addToMatchingData(data: MatchingData, key: string, id: number): void {
 
 @Injectable()
 export class PacksService extends DBService<Pack, number> {
-  private _matchingData?: MatchingData;
+  private readonly matchingData: Observable<MatchingData>;
+
   constructor(private readonly chunksService: ChunksService) {
     super(db.packs);
-    this.change.subscribe(this.clearMatchingData.bind(this));
+    let cachedData: Promise<MatchingData> | undefined;
+    this.matchingData = defer(() => {
+      if (cachedData === undefined) {
+        cachedData = this.makeMatchingData();
+      }
+
+      return cachedData;
+    });
+
+    this.change.subscribe(() => {
+      cachedData = undefined;
+    });
   }
 
-  private clearMatchingData(): void {
-    this._matchingData = undefined;
-  }
-
-  private async getMatchingData(): Promise<MatchingData> {
-    if (this._matchingData === undefined) {
-      const packs = await this.getRecords();
-      const data: MatchingData = Object.create(null);
-      for (const pack of packs) {
-        const schemaID = pack.schema;
+  private async makeMatchingData(): Promise<MatchingData> {
+    const packs = await this.getRecords();
+    const data: MatchingData = Object.create(null);
+    for (const pack of packs) {
+      const schemaID = pack.schema;
+      // tslint:disable-next-line:no-non-null-assertion
+      const id = pack.id!;
+      const { localName, namespaceURI } = pack.match;
+      if (localName === "") {
         // tslint:disable-next-line:no-non-null-assertion
-        const id = pack.id!;
-        const { localName, namespaceURI } = pack.match;
-        if (localName === "") {
-          const schemaChunk =
-            // tslint:disable-next-line:no-non-null-assertion
-            (await this.chunksService.getRecordById(schemaID))!;
-          const schema = await schemaChunk.getData();
-          const grammar = constructTree(schema);
-          const walker = grammar.newWalker();
-          const possible: Event[] = walker.possible().toArray();
-          for (const event of possible) {
-            if (event.params[0] === "enterStartTag") {
-              const name = event.params[1] as BaseName;
+        const schemaChunk = (await this.chunksService.getRecordById(schemaID))!;
+        const schema = await schemaChunk.getData();
+        const grammar = constructTree(schema);
+        const walker = grammar.newWalker();
+        const possible: Event[] = walker.possible().toArray();
+        for (const event of possible) {
+          if (event.params[0] === "enterStartTag") {
+            const name = event.params[1] as BaseName;
 
-              // We only work with simple patterns that match exactly one name.
-              const names = name.toArray();
-              if (names !== null && names.length === 1) {
-                const key = makeMatchKey(names[0].name, names[0].ns);
-                addToMatchingData(data, key, id);
-              }
+            // We only work with simple patterns that match exactly one name.
+            const names = name.toArray();
+            if (names !== null && names.length === 1) {
+              const key = makeMatchKey(names[0].name, names[0].ns);
+              addToMatchingData(data, key, id);
             }
           }
         }
-        else {
-          const key = makeMatchKey(localName, namespaceURI);
-          addToMatchingData(data, key, id);
-        }
       }
-
-      this._matchingData = data;
+      else {
+        const key = makeMatchKey(localName, namespaceURI);
+        addToMatchingData(data, key, id);
+      }
     }
 
-    return this._matchingData;
+    return data;
   }
 
   /**
-   * Match an element's local name and namespace URI with a pack.
+   * Get a match observable for the specified parameters. The match observable
+   * will produce a new value whenever there has been a change in the packs
+   * database that changes whether or not a pack matches the local name and
+   * namespace URI passed.
    *
    * @param localName The local name of the element.
    *
    * @param namespaceURI The URI of the namespace of the element.
    *
-   * @returns The pack, if one matches.
+   * @returns The observable tracking whether there's a match.
    */
-  async matchWithPack(localName: string,
-                      namespaceURI: string): Promise<Pack | undefined> {
+  getMatchObservable(localName: string,
+                     namespaceURI: string): Observable<Pack | undefined> {
     const key = makeMatchKey(localName, namespaceURI);
-    const id = (await this.getMatchingData())[key];
-    if (id === undefined) {
-      return undefined;
-    }
-    return this.getRecordById(id);
+    return this.matchingData.pipe(
+      concatMap(async (data) => {
+        const id = data[key];
+        return (id === undefined) ? undefined : this.getRecordById(id);
+      }));
   }
 
   /**
