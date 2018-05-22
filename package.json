@@ -71,7 +71,7 @@
     "eslint": "^3.16.1",
     "eslint-config-lddubeau-base": "^1.0.4",
     "fs-extra": ">=0.26.0 <1",
-    "gulp": ">=3.9.0 <4",
+    "gulp": "^3.9.1",
     "gulp-debug": ">=2.1.0 <3",
     "gulp-eslint": "^3.0.1",
     "gulp-newer": ">=1.0.0 <2",
