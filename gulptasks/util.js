@@ -1,40 +1,15 @@
 const gulp = require("gulp");
 const gulpNewer = require("gulp-newer");
 const childProcess = require("child_process");
-const Promise = require("bluebird");
 const gutil = require("gulp-util");
 const fs = require("fs-extra");
 const del = require("del");
-const path = require("path");
 const { execFile } = require("child-process-promise");
 
 exports.fs = fs;
 
 exports.mkdirp = fs.ensureDir;
 exports.del = del;
-
-const copy = exports.copy = fs.copy;
-
-const cprp = exports.cprp = function cprp(src, dest) {
-  return copy(src, dest, { overwrite: true, preserveTimestamps: true });
-};
-
-exports.cprpdir = function cprpdir(src, dest) {
-  if (!(src instanceof Array)) {
-    src = [src];
-  }
-  const promises = [];
-  for (const s of src) {
-    const basename = path.basename(s);
-    promises.push(cprp(s, path.join(dest, basename)));
-  }
-
-  if (promises.length === 0) {
-    return promises[0];
-  }
-
-  return Promise.each(promises, () => {});
-};
 
 exports.exec = function exec(command, options) {
   return new Promise((resolve, reject) => {
@@ -46,13 +21,6 @@ exports.exec = function exec(command, options) {
       }
       resolve(stdout, stderr);
     });
-  });
-};
-
-exports.checkStatusFile = function checkStatusFile(file, args, options) {
-  return new Promise((resolve) => {
-    childProcess.execFile(file, args, options,
-                          err => resolve(err ? err.code : 0));
   });
 };
 
@@ -84,12 +52,6 @@ exports.newer = function newer(src, dest, forceDestFile) {
 
     stream.on("end", end);
   });
-};
-
-exports.copyIfNewer = function copyIfNewer(src, dest) {
-  return src
-    .pipe(gulpNewer(dest))
-    .pipe(gulp.dest(dest));
 };
 
 exports.spawn = function spawn(cmd, args, options) {
