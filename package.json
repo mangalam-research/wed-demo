@@ -36,7 +36,7 @@
     "bootbox": ">=4.4.0 <5",
     "bootstrap": ">=3.3.6 <3.4",
     "core-js": "^2.4.1",
-    "dexie": "^2.0.1",
+    "dexie": "^2.0.3",
     "font-awesome": ">=4.4.0 <4.5",
     "jquery": ">=2.0.0 <3",
     "last-resort": "^0.1.0",
