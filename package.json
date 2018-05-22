@@ -96,7 +96,6 @@
     "serve-static": ">=1.7.1 <2",
     "sinon": "https://registry.npmjs.org/sinon/-/sinon-1.17.5.tgz",
     "sinon-chai": "^2.9.0",
-    "touch": ">=1.0.0 <2",
     "ts-loader": "^3.1.1",
     "tslint": "^5.6.0",
     "tslint-config-lddubeau": "^2.0.0",

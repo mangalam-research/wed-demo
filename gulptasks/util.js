@@ -5,14 +5,12 @@ const Promise = require("bluebird");
 const gutil = require("gulp-util");
 const _fs = require("fs-extra");
 const _del = require("del");
-const touch = require("touch");
 const path = require("path");
 const { execFile } = require("child-process-promise");
 
 const fs = Promise.promisifyAll(_fs);
 exports.fs = fs;
 
-exports.touchAsync = Promise.promisify(touch);
 exports.mkdirpAsync = fs.ensureDirAsync;
 exports.del = _del;
 
