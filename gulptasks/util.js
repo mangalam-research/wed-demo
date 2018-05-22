@@ -3,18 +3,17 @@ const gulpNewer = require("gulp-newer");
 const childProcess = require("child_process");
 const Promise = require("bluebird");
 const gutil = require("gulp-util");
-const _fs = require("fs-extra");
-const _del = require("del");
+const fs = require("fs-extra");
+const del = require("del");
 const path = require("path");
 const { execFile } = require("child-process-promise");
 
-const fs = Promise.promisifyAll(_fs);
 exports.fs = fs;
 
-exports.mkdirpAsync = fs.ensureDirAsync;
-exports.del = _del;
+exports.mkdirp = fs.ensureDir;
+exports.del = del;
 
-const copy = exports.copy = fs.copyAsync;
+const copy = exports.copy = fs.copy;
 
 const cprp = exports.cprp = function cprp(src, dest) {
   return copy(src, dest, { overwrite: true, preserveTimestamps: true });

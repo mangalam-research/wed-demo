@@ -9,7 +9,7 @@ const config = require("./config");
 const replace = require("gulp-replace");
 const rename = require("gulp-rename");
 const { execFile } = require("child-process-promise");
-const { del, fs, newer, exec, execFileAndReport, spawn, mkdirpAsync } =
+const { del, fs, newer, exec, execFileAndReport, spawn, mkdirp } =
       require("./util");
 
 // Try to load local configuration options.
@@ -138,7 +138,7 @@ gulp.task("build-info", Promise.coroutine(function *task() {
     return;
   }
 
-  yield mkdirpAsync(path.dirname(dest));
+  yield mkdirp(path.dirname(dest));
 
   yield exec("node misc/generate_build_info.js --unclean " +
              `--module > ${dest}`);
@@ -212,8 +212,8 @@ gulp.task("install-test",
           gulp.series("pack", Promise.coroutine(function *install() {
             const testDir = "build/install_dir";
             yield del(testDir);
-            yield fs.mkdirAsync(testDir);
-            yield fs.mkdirAsync(path.join(testDir, "node_modules"));
+            yield fs.mkdir(testDir);
+            yield fs.mkdir(path.join(testDir, "node_modules"));
             yield execFile("npm", ["install", `../${packname}`], { cwd: testDir });
             yield del(testDir);
           })));
