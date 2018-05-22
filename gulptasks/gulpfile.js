@@ -77,12 +77,7 @@ gulp.task("copy-other",
           () => gulp.src(["web/**/*.{js,html,css}", "src/**/*.{js,html,css}"])
           .pipe(gulp.dest("build/dev/lib/")));
 
-gulp.task("build-dev", ["tsc", "copy-other"]);
-
-gulp.task("webpack", ["build-aot-compiled", "copy-other"], () =>
-          execFileAndReport("./node_modules/.bin/webpack", ["--color"]));
-
-gulp.task("build-prod", ["webpack"]);
+gulp.task("build-dev", gulp.parallel("tsc", "copy-other"));
 
 // The process by which get to to an AoT build is complex but that's due to
 // bugs/quirks/bullshit in the toolchain.
@@ -106,10 +101,11 @@ gulp.task("create-aot-main", () =>
 gulp.task("copy-aot", () => gulp.src(["src/**/*.{js,html,css}"])
           .pipe(gulp.dest("build/aot/")));
 
-gulp.task("tsc-aot", ["ngc", "create-aot-main"],
-          () => tsc("tsconfig-prod.json", "build/aot-interm"));
+gulp.task("tsc-aot",
+          gulp.series(gulp.parallel("ngc", "create-aot-main"),
+                      () => tsc("tsconfig-prod.json", "build/aot-interm")));
 
-gulp.task("build-aot", ["tsc-aot", "copy-aot"]);
+gulp.task("build-aot", gulp.parallel("tsc-aot", "copy-aot"));
 
 // The compilation step with tsc created a file hierarchy that is not suitable
 // to be consumed elsewhere. We need to create a single hierarchy that looks
@@ -118,14 +114,22 @@ gulp.task("build-aot", ["tsc-aot", "copy-aot"]);
 // .ngsummary.json files in the final tree. The .ngsummary.json files contain
 // hardcoded paths (to fictional modules, no less!) which makes them
 // reaaaaaaaaaaaally useless.
-gulp.task("combine-aot", ["tsc-aot"],
-          () => gulp.src(["src/**/*.{html,css}",
-                          "build/aot/**/*.metadata.json",
-                          "build/aot-interm/build/aot/**/*",
-                          "build/aot-interm/src/**/*"])
-          .pipe(gulp.dest("build/aot-compiled")));
+gulp.task("combine-aot",
+          gulp.series("tsc-aot",
+                      () => gulp.src(["src/**/*.{html,css}",
+                                      "build/aot/**/*.metadata.json",
+                                      "build/aot-interm/build/aot/**/*",
+                                      "build/aot-interm/src/**/*"])
+                      .pipe(gulp.dest("build/aot-compiled"))));
 
-gulp.task("build-aot-compiled", ["combine-aot"]);
+gulp.task("build-aot-compiled", gulp.task("combine-aot"));
+
+gulp.task("webpack",
+          gulp.series(gulp.parallel("build-aot-compiled", "copy-other"),
+                      () => execFileAndReport("./node_modules/.bin/webpack",
+                                              ["--color"])));
+
+gulp.task("build-prod", gulp.task("webpack"));
 
 gulp.task("build-info", Promise.coroutine(function *task() {
   const dest = "build/dev/lib/build-info.js";
@@ -140,7 +144,7 @@ gulp.task("build-info", Promise.coroutine(function *task() {
              `--module > ${dest}`);
 }));
 
-gulp.task("default", ["build-dev"]);
+gulp.task("default", gulp.task("build-dev"));
 
 function runTslint(tsconfig, tslintConfig) {
   return spawn(
@@ -150,12 +154,15 @@ function runTslint(tsconfig, tslintConfig) {
     { stdio: "inherit" });
 }
 
-gulp.task("tslint-src", () => runTslint("src/tsconfig.json", "src/tslint.json"));
+gulp.task("tslint-src", () => runTslint("src/tsconfig.json",
+                                        "src/tslint.json"));
 
-gulp.task("tslint-test", ["tsc"],
-          () => runTslint("test/tsconfig.json", "test/tslint.json"));
+gulp.task("tslint-test",
+          gulp.series("tsc",
+                      () => runTslint("test/tsconfig.json",
+                                      "test/tslint.json")));
 
-gulp.task("tslint", ["tslint-src", "tslint-test"]);
+gulp.task("tslint", gulp.parallel("tslint-src", "tslint-test"));
 
 gulp.task("eslint", () =>
           gulp.src(["lib/**/*.js", "*.js", "bin/**", "config/**/*.js",
@@ -165,7 +172,7 @@ gulp.task("eslint", () =>
           .pipe(eslint.format())
           .pipe(eslint.failAfterError()));
 
-gulp.task("lint", ["eslint", "tslint"]);
+gulp.task("lint", gulp.parallel("eslint", "tslint"));
 
 //
 // Spawning a process due to this:
@@ -180,38 +187,47 @@ function runKarma(localOptions) {
   return spawn("./node_modules/.bin/karma", localOptions, { stdio: "inherit" });
 }
 
-gulp.task("test-karma", ["build-dev"],
-          () => runKarma(["start", "--single-run"]));
+gulp.task("test-karma", gulp.series("build-dev",
+                                    () => runKarma(["start", "--single-run"])));
 
-gulp.task("test", ["test-karma", "tslint", "eslint"]);
+gulp.task("test", gulp.parallel("test-karma", "tslint", "eslint"));
 
 let packname;
-gulp.task("pack", ["test", "build-prod", "build-aot-compiled", "copy-package-info"],
-  () => execFile("npm", ["pack", "."], { cwd: "build" })
-    .then((result) => {
-      packname = result.stdout.trim();
-    }));
+gulp.task("pack",
+          gulp.series(
+            gulp.parallel("test", "build-prod", "build-aot-compiled",
+                          "copy-package-info"),
+            () => execFile("npm", ["pack", "."], { cwd: "build" })
+              .then((result) => {
+                packname = result.stdout.trim();
+              })));
 
-gulp.task("pack-notest", ["build-dev", "build-prod", "build-aot-compiled",
-                          "copy-package-info"],
-          () => execFile("npm", ["pack", "."], { cwd: "build" }));
+gulp.task("pack-notest",
+          gulp.series(
+            gulp.parallel("build-dev", "build-prod", "build-aot-compiled",
+                          "copy-package-info"),
+            () => execFile("npm", ["pack", "."], { cwd: "build" })));
 
-gulp.task("install-test", ["pack"], Promise.coroutine(function *install() {
-  const testDir = "build/install_dir";
-  yield del(testDir);
-  yield fs.mkdirAsync(testDir);
-  yield fs.mkdirAsync(path.join(testDir, "node_modules"));
-  yield execFile("npm", ["install", `../${packname}`], { cwd: testDir });
-  yield del(testDir);
-}));
+gulp.task("install-test",
+          gulp.series("pack", Promise.coroutine(function *install() {
+            const testDir = "build/install_dir";
+            yield del(testDir);
+            yield fs.mkdirAsync(testDir);
+            yield fs.mkdirAsync(path.join(testDir, "node_modules"));
+            yield execFile("npm", ["install", `../${packname}`], { cwd: testDir });
+            yield del(testDir);
+          })));
 
-gulp.task("publish", ["install-test"],
-          () => execFile("npm", ["publish", packname], { cwd: "build" }));
+gulp.task("publish",
+          gulp.series("install-test",
+                      () => execFile("npm", ["publish", packname],
+                                     { cwd: "build" })));
 
 gulp.task("clean", () => del(["build", "*.html"]));
 
-gulp.task("distclean", ["clean"],
-          () => del(["downloads", "node_modules"]));
+gulp.task("distclean",
+          gulp.series("clean",
+                      () => del(["downloads", "node_modules"])));
 
 gulp.task("watch-web", () => {
   gulp.watch(["src/**/*", "web/**/*"], ["karma"]);
