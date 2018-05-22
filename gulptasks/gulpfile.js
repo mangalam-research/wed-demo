@@ -4,17 +4,13 @@ const Promise = require("bluebird");
 const path = require("path");
 const requireDir = require("require-dir");
 const eslint = require("gulp-eslint");
-const argparse = require("argparse");
+const { ArgumentParser } = require("argparse");
 const config = require("./config");
 const replace = require("gulp-replace");
 const rename = require("gulp-rename");
-const cpp = require("child-process-promise");
-const { del, fs, newer, exec, execFileAndReport, spawn,
-        mkdirpAsync } = require("./util");
-
-const execFile = cpp.execFile;
-
-const ArgumentParser = argparse.ArgumentParser;
+const { execFile } = require("child-process-promise");
+const { del, fs, newer, exec, execFileAndReport, spawn, mkdirpAsync } =
+      require("./util");
 
 // Try to load local configuration options.
 let localConfig = {};

@@ -1,4 +1,5 @@
 /* eslint-env node */
+
 "use strict";
 
 const serveStatic = require("serve-static");
