@@ -8,7 +8,6 @@ import { SchemaDetailsComponent } from "./schema-details.component";
 import { SchemasRoutingModule } from "./schemas-routing.module";
 import { SchemasComponent } from "./schemas.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -21,4 +20,5 @@ import { SchemasComponent } from "./schemas.component";
     SchemaDetailsComponent,
   ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class SchemasModule {}

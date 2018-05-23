@@ -6,7 +6,6 @@ import { SharedModule } from "../shared.module";
 import { ControlRoutingModule } from "./control-routing.module";
 import { ControlComponent } from "./control.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -18,4 +17,5 @@ import { ControlComponent } from "./control.component";
     ControlComponent,
   ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class ControlModule { }

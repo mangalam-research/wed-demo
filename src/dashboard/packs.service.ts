@@ -128,8 +128,8 @@ export class PacksService extends DBService<Pack, number> {
                    data: string | Promise<string>): Promise<Pack> {
     // We do not use the _name parameter as the name of packs is stored in the
     // pack.
-    data = await data;
-    const obj = JSON.parse(data);
+    const resolved = await data;
+    const obj = JSON.parse(resolved);
     if (obj.interchangeVersion !== 1) {
       throw new Error(`unknown interchangeVersion: ${obj.interchangeVersion}`);
     }

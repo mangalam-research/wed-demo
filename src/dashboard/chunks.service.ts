@@ -7,8 +7,7 @@
 "use strict";
 
 import { Chunk } from "./chunk";
-import { ChunkTable } from "./store";
-import { db } from "./store";
+import { ChunkTable, db } from "./store";
 import { filesEqual } from "./util";
 
 export class ChunksService {

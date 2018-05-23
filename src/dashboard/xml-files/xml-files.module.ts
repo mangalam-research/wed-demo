@@ -8,7 +8,6 @@ import { XMLFileDetailsComponent } from "./xml-file-details.component";
 import { XMLFilesRoutingModule } from "./xml-files-routing.module";
 import { XMLFilesComponent } from "./xml-files.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -21,4 +20,5 @@ import { XMLFilesComponent } from "./xml-files.component";
     XMLFileDetailsComponent,
   ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class XMLFilesModule {}

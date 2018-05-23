@@ -7,7 +7,6 @@ const routes: Routes = [
   { path: "",  component: ControlComponent },
 ];
 
-// tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     RouterModule.forChild(routes),
@@ -16,4 +15,5 @@ const routes: Routes = [
     RouterModule,
   ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class ControlRoutingModule { }

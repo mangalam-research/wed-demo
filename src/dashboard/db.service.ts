@@ -29,9 +29,9 @@ export interface Clearable {
 }
 
 export type Confirmer = (message: string) => Promise<boolean>;
-export type WriteCheckResult<Value> = {write: boolean, record: Value | null};
+export type WriteCheckResult<Value> = { write: boolean; record: Value | null };
 
-export type NameIdArray<Key> = {name: string, id: Key}[];
+export type NameIdArray<Key> = { name: string; id: Key }[];
 
 export abstract class DBService<Value extends IValue<Key>,
 Key extends string | number> implements Loader<Value>, Clearable {

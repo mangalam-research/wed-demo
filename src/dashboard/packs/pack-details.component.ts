@@ -1,6 +1,6 @@
 import { Location } from "@angular/common";
-import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef,
-         OnInit, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, ComponentFactory, ComponentFactoryResolver, OnInit,
+         ViewChild, ViewContainerRef } from "@angular/core";
 import { AbstractControl, FormBuilder, FormGroup,
          Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
@@ -35,7 +35,7 @@ export class PackDetailsComponent implements OnInit {
   container!: ViewContainerRef;
   form!: FormGroup;
   readonly formErrors: {[name: string]: string } = {};
-  readonly validationMessages: {[name: string]: {[name: string]: string}}= {
+  readonly validationMessages: {[name: string]: {[name: string]: string}} = {
     name: {
       required: "Name is required.",
       duplicateName: "This name already exists.",
@@ -237,8 +237,7 @@ export class PackDetailsComponent implements OnInit {
   }
 
   private async getChoice(title: string, choices: Choice[]): Promise<Result> {
-    const component = (this.container.createComponent(this.dialogFactory) as
-                       ComponentRef<DialogChoiceComponent>);
+    const component = this.container.createComponent(this.dialogFactory);
     component.instance.title = title;
     component.instance.choices = choices;
     component.instance.selected = undefined;

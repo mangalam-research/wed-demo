@@ -8,7 +8,6 @@ import { MetadataDetailsComponent } from "./metadata-details.component";
 import { MetadataRoutingModule } from "./metadata-routing.module";
 import { MetadataComponent } from "./metadata.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -21,4 +20,5 @@ import { MetadataComponent } from "./metadata.component";
     MetadataDetailsComponent,
   ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class MetadataModule {}

@@ -10,11 +10,11 @@ export const routes: Routes = [
   { path: "control", loadChildren: "./control/control.module#ControlModule" },
   { path: "packs", loadChildren: "./packs/packs.module#PacksModule" },
 ];
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [ RouterModule.forRoot(routes, {
     useHash: true,
   }) ],
   exports: [ RouterModule ],
 })
+// tslint:disable-next-line:no-unnecessary-class
 export class AppRoutingModule {}

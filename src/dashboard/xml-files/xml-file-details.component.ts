@@ -20,7 +20,7 @@ export class XMLFileDetailsComponent implements OnInit {
   currentForm?: NgForm;
   formSub: Subscription | undefined;
   readonly formErrors: {[name: string]: string } = {};
-  readonly validationMessages: {[name: string]: {[name: string]: string}}= {
+  readonly validationMessages: {[name: string]: {[name: string]: string}} = {
     name: {
       required: "Name is required.",
     },

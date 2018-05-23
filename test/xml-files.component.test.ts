@@ -123,7 +123,7 @@ describe("XMLFilesComponent", () => {
        {name: "b", data: "<q/>"},
        {name: "c", data:
         "<doc xmlns='http://mangalamresearch.org/ns/mmwp/doc'/>" }] as
-       { name: string, data: string, pack?: number }[])
+       { name: string; data: string; pack?: number }[])
         .map(async (x) => {
           const record = await recordsService.makeRecord(x.name, x.data);
           record.pack = x.pack;

@@ -13,14 +13,14 @@ export class Chunk {
   static async makeChunk(file: File | string | Promise<File | string>):
   Promise<Chunk> {
 
-    file = await file;
+    const resolved = await file;
 
-    if (typeof file === "string") {
-      return new Chunk(md5(file), new File([file], ""), file);
+    if (typeof resolved === "string") {
+      return new Chunk(md5(resolved), new File([resolved], ""), resolved);
     }
 
-    const data = await readFile(file);
-    return new Chunk(md5(data), file, data);
+    const data = await readFile(resolved);
+    return new Chunk(md5(data), resolved, data);
   }
 
   private constructor(id: string, file: File, data: string) {

@@ -10,7 +10,6 @@ const routes: Routes = [
   { path: "new",  component: XMLFileDetailsComponent },
 ];
 
-// tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     RouterModule.forChild(routes),
@@ -19,4 +18,5 @@ const routes: Routes = [
     RouterModule,
   ],
 })
-export class XMLFilesRoutingModule { }
+// tslint:disable-next-line:no-unnecessary-class
+export class XMLFilesRoutingModule {}

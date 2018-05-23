@@ -19,7 +19,8 @@
     "newline-before-return": [false, "Not for this project."],
     "no-import-side-effect": [true,
                               { "ignore-pattern": "^(jquery|bootstrap)$" }],
-    "no-backbone-get-set-outside-model": [false, "No backbone in this project."]
+    "no-backbone-get-set-outside-model": [false, "No backbone in this project."],
+    "no-submodule-imports": [true, "rxjs", "wed"]
   },
   "cliOptions": {
     "exclude": [

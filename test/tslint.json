@@ -5,6 +5,8 @@
                              "positives."],
     "no-non-null-assertion": [false, "A wrongly used assertion will cause a ",
                               "crash and the test to fail."],
-    "await-promise": [true, "Thenable"]
+    "await-promise": [true, "Thenable"],
+    "no-implicit-dependencies": [false, "Does not work well with our setup."],
+    "no-submodule-imports": [true, "dashboard", "@angular", "rxjs"]
   }
 }

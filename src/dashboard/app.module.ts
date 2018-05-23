@@ -46,6 +46,6 @@ export const configuration: NgModule = {
   bootstrap: [ AppComponent ],
 };
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule(configuration)
+//tslint:disable-next-line: no-unnecessary-class
 export class AppModule {}

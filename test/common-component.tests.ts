@@ -70,7 +70,7 @@ export const renderTests = new TestSuite<ComponentTestState>("renders HTML")
       const trs = el.getElementsByTagName("tr");
       let recordIndex = 0;
       for (const tr of Array.from(trs).slice(1)) {
-        expect(tr.attributes.getNamedItem("data-record-name").value)
+        expect(tr.attributes.getNamedItem("data-record-name")!.value)
           .to.equal(component.records[recordIndex].name);
         recordIndex++;
       }

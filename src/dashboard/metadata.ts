@@ -1,7 +1,7 @@
 import { Chunk } from "./chunk";
 import { ChunkedRecord } from "./chunked-record";
 
-export type PrefixNamespacePair = { prefix: string, uri: string };
+export type PrefixNamespacePair = { prefix: string; uri: string };
 //tslint:disable-next-line:no-any
 export type ParsedData = any;
 

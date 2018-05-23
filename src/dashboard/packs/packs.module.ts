@@ -8,7 +8,6 @@ import { PackDetailsComponent } from "./pack-details.component";
 import { PacksRoutingModule } from "./packs-routing.module";
 import { PacksComponent } from "./packs.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -22,4 +21,5 @@ import { PacksComponent } from "./packs.component";
     PacksComponent,
   ],
 })
-export class PacksModule { }
+// tslint:disable-next-line:no-unnecessary-class
+export class PacksModule {}

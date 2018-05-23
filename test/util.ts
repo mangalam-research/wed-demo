@@ -100,6 +100,7 @@ export function expectReject(p: Promise<any>,
         expect(ex).to.be.instanceof(errorLike);
       }
       else {
+        // tslint:disable-next-line:no-parameter-reassignment
         pattern = errorLike;
       }
 

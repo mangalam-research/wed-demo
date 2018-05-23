@@ -6,7 +6,6 @@ import { NgModule } from "@angular/core";
 import { ClearStoreComponent } from "./clear-store.component";
 import { UploadComponent } from "./upload.component";
 
-//tslint:disable-next-line:no-stateless-class
 @NgModule({
   imports: [
     CommonModule,
@@ -20,4 +19,5 @@ import { UploadComponent } from "./upload.component";
     UploadComponent,
   ],
 })
-export class SharedModule { }
+// tslint:disable-next-line:no-unnecessary-class
+export class SharedModule {}
