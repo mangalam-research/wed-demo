@@ -27,18 +27,27 @@ describe("ChunksService", () => {
   async function assertEqualChunks(a: Chunk, b: Chunk): Promise<void> {
     // Access data on both objects so that they become fit for a deep.equal.
     await Promise.all([a.getData(), b.getData()]);
-    expect(a).to.deep.equal(b);
+    // We cannot do a deep compare due to fields that are promises, etc.
+    expect(a).to.have.property("id").equal(b.id);
+    expect(a).to.have.property("recordVersion").equal(b.recordVersion);
+    expect(a).to.have.property("recordType").equal(b.recordType);
+    expect(await a.getData()).to.equal(await b.getData());
   }
 
   async function assertEqualLists(a: Chunk[], b: Chunk[]): Promise<void> {
     expect(a.length).to.equal(b.length);
+
+    // Nothing more to do.
+    if (a.length === 0) {
+      return;
+    }
+
     // Access data in both lists so that they become fit for a deep.equal.
-    const promises: Promise<string>[] = [];
+    const promises: Promise<void>[] = [];
     for (let ix = 0; ix < a.length; ++ix) {
-      promises.push(a[ix].getData(), b[ix].getData());
+      promises.push(assertEqualChunks(a[ix], b[ix]));
     }
     await Promise.all(promises);
-    expect(a).to.deep.equal(b);
   }
 
   before(() => {
@@ -71,21 +80,19 @@ describe("ChunksService", () => {
   });
 
   describe("#updateRecord", () => {
-    it("adds the record, if it does not yet exist", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => assertEqualLists(records, [file])));
+    it("adds the record, if it does not yet exist", async () => {
+      await service.updateRecord(file);
+      await assertEqualLists(await service.getRecords(), [file]);
+    });
 
-    it("fails, when changing a record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record!, file))
-       .then(() => {
-         // tslint:disable-next-line:no-any
-         (file as any).file = new File(["something else"], "a");
-         return expectReject(service.updateRecord(file),
-                             Error, /trying to update chunk with id/);
-       }));
+    it("fails, when changing a record", async () => {
+      await service.updateRecord(file);
+      await assertEqualChunks((await service.getRecordById(file.id))!, file);
+      // tslint:disable-next-line:no-any
+      (file as any).file = new File(["something else"], "a");
+      return expectReject(service.updateRecord(file),
+                          Error, /trying to update chunk with id/);
+    });
 
     it("is a no-op on an existing, unchaged record", async () => {
       await service.updateRecord(file);
