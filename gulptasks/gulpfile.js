@@ -149,8 +149,7 @@ gulp.task("default", gulp.task("build-dev"));
 function runTslint(tsconfig, tslintConfig) {
   return spawn(
     "./node_modules/.bin/tslint",
-    ["--type-check", "--project", tsconfig, "-c", tslintConfig,
-     "-t", "verbose"],
+    ["--project", tsconfig, "-c", tslintConfig, "-t", "verbose"],
     { stdio: "inherit" });
 }
 
