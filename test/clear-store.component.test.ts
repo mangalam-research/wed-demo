@@ -27,7 +27,7 @@ describe("ClearStoreComponent", () => {
   let fakeConfirmer: sinon.SinonStub;
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
       declarations: [ ClearStoreComponent ],

@@ -39,7 +39,7 @@ describe("ChunkedRecord", () => {
   after(() => db.delete().then(() => db.open()));
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {

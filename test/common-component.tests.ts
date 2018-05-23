@@ -106,7 +106,8 @@ export const eventTests = new TestSuite<ComponentTestState>("handles events")
 
     ctx.it("downloads when the download button is clicked", (tctx) => {
       const { component, el, fixture, sandbox } = tctx.state;
-      const downloadStub = sandbox.stub(component, "triggerDownload");
+      // tslint:disable-next-line:no-any
+      const downloadStub = sandbox.stub(component, "triggerDownload" as any);
       const downloadButton =
         el.querySelector(".btn.download-button")! as HTMLAnchorElement;
       downloadButton.click();
@@ -117,5 +118,4 @@ export const eventTests = new TestSuite<ComponentTestState>("handles events")
     // We cannot test the upload support here. There is no way to fill an
     // input with type="file" with actual files. We can blank such element
     // (el.value = "").
-
   });

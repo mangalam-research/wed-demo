@@ -19,7 +19,7 @@
   var config = window.systemJSConfig;
   config.baseURL = "/base/build/dev/lib/";
   config.paths["npm:"] = "/base/node_modules/";
-  config.map.sinon = "npm:sinon";
+  config.map.sinon = "npm:sinon/pkg/sinon.js";
   config.map["sinon-chai"] = "npm:sinon-chai";
   config.map["check-error"] = "npm:check-error/check-error.js";
   config.map["@angular/router/testing"] =

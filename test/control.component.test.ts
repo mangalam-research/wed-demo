@@ -83,7 +83,7 @@ describe("ControlComponent", () => {
   const packA = JSON.stringify(packAUnserialized);
 
   beforeEach(async () => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
       declarations: [ ControlComponent ],

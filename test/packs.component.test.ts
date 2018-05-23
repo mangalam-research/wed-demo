@@ -79,7 +79,7 @@ describe("PacksComponent", () => {
   const state: ComponentTestState = Object.create(null);
 
   beforeEach(async () => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     TestBed.configureTestingModule({

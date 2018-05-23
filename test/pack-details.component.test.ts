@@ -121,7 +121,7 @@ describe("PackDetailsComponent", () => {
   };
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   beforeEach(async () => {
@@ -338,7 +338,8 @@ describe("PackDetailsComponent", () => {
     beforeEach(async () => {
       schemas = await schemasService.getNameIdArray();
       await createComponent("new");
-      getChoice = sandbox.stub(component, "getChoice");
+      // tslint:disable-next-line:no-any
+      getChoice = sandbox.stub(component, "getChoice" as any);
       field = component.form.get("schema")!;
       expect(field.value).to.be.null;
     });
@@ -376,7 +377,8 @@ describe("PackDetailsComponent", () => {
     beforeEach(async () => {
       metadata = await metadataService.getNameIdArray();
       await createComponent("new");
-      getChoice = sandbox.stub(component, "getChoice");
+      // tslint:disable-next-line:no-any
+      getChoice = sandbox.stub(component, "getChoice" as any);
       field = component.form.get("metadata")!;
       expect(field.value).to.be.null;
     });

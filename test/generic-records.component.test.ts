@@ -52,7 +52,7 @@ describe("GenericRecordsComponent", () => {
   let router: Router;
 
   beforeEach(async () => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
       imports: [
@@ -122,7 +122,7 @@ describe("GenericRecordsComponent", () => {
 
   describe("#download", () => {
     it("triggers a download with the right data", async () => {
-      const stub = sandbox.stub(component, "triggerDownload");
+      const stub = sandbox.stub(component, "triggerDownload" as any);
       await component.download(records[0]);
       expect(stub).to.have.been.calledWith("a", "foo");
     });

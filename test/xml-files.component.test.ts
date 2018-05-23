@@ -90,7 +90,7 @@ describe("XMLFilesComponent", () => {
   });
 
   beforeEach(async () => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     fakePrompter = sandbox.stub();
@@ -171,7 +171,8 @@ describe("XMLFilesComponent", () => {
   describe("#edit", () => {
     let goToStub: sinon.SinonStub;
     beforeEach(() => {
-      goToStub = sandbox.stub(component, "goTo");
+      // tslint:disable-next-line:no-any
+      goToStub = sandbox.stub(component, "goTo" as any);
     });
 
     it("fails if the file has no pack associated with it", async () => {
@@ -366,7 +367,8 @@ describe("XMLFilesComponent", () => {
 
   describe("handles events:", () => {
     it("navigates to the editor when edit button is clicked", async () => {
-      const goToStub = sandbox.stub(component, "goTo");
+      // tslint:disable-next-line:no-any
+      const goToStub = sandbox.stub(component, "goTo" as any);
       const pack = await packsService.getRecordById(component.records[0].pack!);
       const editButton =
         el.querySelector(".btn.edit-button")! as HTMLAnchorElement;

@@ -36,7 +36,7 @@ describe("SchemasComponent", () => {
   const state: ComponentTestState = Object.create(null);
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     TestBed.configureTestingModule({

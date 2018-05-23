@@ -90,6 +90,7 @@ module.exports = function configure(config) {
         // We have to have them inline for the browser to find them.
         inlineSourceMap: true,
         inlineSources: true,
+        // noEmitOnError: false,
       },
       // transformPath: (path) => path.replace(/\.ts$/, ".js"),
     },

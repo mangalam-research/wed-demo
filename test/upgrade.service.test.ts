@@ -24,7 +24,7 @@ describe("UpgradeService", () => {
   });
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeAlert = sandbox.stub();
     fakeAlert.returns(Promise.resolve());
     confirmService = new ConfirmService(undefined, undefined, fakeAlert);

@@ -43,7 +43,7 @@ describe("UploadComponent", () => {
   let fakeConfirmer: sinon.SinonStub;
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
       declarations: [ UploadComponent ],
