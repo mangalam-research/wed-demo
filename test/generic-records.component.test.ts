@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
@@ -24,7 +23,7 @@ import { UploadComponent } from "dashboard/upload.component";
 import { XMLFile } from "dashboard/xml-file";
 import { XMLFilesService } from "dashboard/xml-files.service";
 import { XMLFilesComponent } from "dashboard/xml-files/xml-files.component";
-import { waitFor, waitForSuccess } from "./util";
+import { expectReject, waitFor, waitForSuccess } from "./util";
 
 //
 // We use any a lot in this code. There's little benefit with doing away with
@@ -102,88 +101,85 @@ describe("GenericRecordsComponent", () => {
   });
 
   describe("#del", () => {
-    it("asks for a confirmation", () => {
+    it("asks for a confirmation", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      return component.del(records[0])
-        .then(() => expect(fakeConfirmer.callCount).to.equal(1));
+      await component.del(records[0]);
+      expect(fakeConfirmer.callCount).to.equal(1);
     });
 
-    it("deletes if the user confirmed", () => {
+    it("deletes if the user confirmed", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      return component.del(records[0])
-        .then(() => waitForSuccess(
-          () => expect(component.records).to.have.length(1)));
+      await component.del(records[0]);
+      return waitForSuccess(() => expect(component.records).to.have.length(1));
     });
 
-    it("does not delete if the user answered negatively", () => {
+    it("does not delete if the user answered negatively", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      return component.del(records[0])
-        .then(() => expect(component.records).to.have.length(2));
+      await component.del(records[0]);
+      expect(component.records).to.have.length(2);
     });
   });
 
   describe("#download", () => {
-    it("triggers a download with the right data", () => {
+    it("triggers a download with the right data", async () => {
       const stub = sandbox.stub(component, "triggerDownload");
-      return component.download(records[0])
-        .then(() => expect(stub).to.have.been.calledWith("a", "foo"));
+      await component.download(records[0]);
+      expect(stub).to.have.been.calledWith("a", "foo");
     });
   });
 
   // #triggerDownload cannot be tested here.
 
   describe("#upload", () => {
-    it("is a no-op if there are no files", () => {
+    it("is a no-op if there are no files", async () => {
       const stub = sandbox.stub(recordsService, "safeLoadFromFile");
-      return component.upload(records[0], {
+      await component.upload(records[0], {
         target: {
           files: undefined,
         },
-      } as any)
-        .then(() => expect(stub).to.have.not.been.called)
-        .then(() => component.upload(records[0], {
-          target: {
-            files: [],
-          },
-        } as any))
-        .then(() => expect(stub).to.have.not.been.called);
-    });
-
-    it("throws if there are more than one file", () => {
-      expect(component.upload(records[0], {
+      } as any);
+      expect(stub).to.have.not.been.called;
+      await component.upload(records[0], {
         target: {
-          files: [new File(["one"], "one"),
-                  new File(["two"], "two")],
+          files: [],
         },
-      } as any)).to.be.rejectedWith(
-        Error,
-        /internal error: the upload control cannot be used for multiple files/);
-
+      } as any);
+      expect(stub).to.have.not.been.called;
     });
 
-    it("replaces the record", () =>
-       component.upload(records[0], {
+    it("throws if there are more than one file", () =>
+      expectReject(
+        component.upload(records[0], {
+          target: {
+            files: [new File(["one"], "one"),
+                    new File(["two"], "two")],
+          },
+        } as any),
+        Error,
+        /internal error: the upload control cannot be used for multiple files/),
+      );
+
+    it("replaces the record", async () => {
+      await component.upload(records[0], {
          target: {
            files: [new File(["new data"], "new file")],
          },
-       } as any)
-       .then(() => recordsService.getRecordById(records[0].id!))
-       .then((record) => expect(record!.getData())
-             .to.eventually.equal("new data")));
+      } as any);
+      const record = await recordsService.getRecordById(records[0].id!);
+      expect(await record!.getData()).to.equal("new data");
+    });
 
-    it("uses the processing service", () => {
+    it("uses the processing service", async () => {
       const stub = sandbox.stub(FakeProcessingService.prototype);
-      return component.upload(records[0], {
+      await component.upload(records[0], {
         target: {
           files: [new File(["new data"], "new file")],
         },
-       } as any)
-        .then(() => {
-          expect((stub as any).start).to.have.been.calledOnce;
-          expect((stub as any).start).to.have.been.calledWith(1);
-          expect((stub as any).increment).to.have.been.calledOnce;
-          expect((stub as any).stop).to.have.been.calledOnce;
-        });
+      } as any);
+      expect((stub as any).start).to.have.been.calledOnce;
+      expect((stub as any).start).to.have.been.calledWith(1);
+      expect((stub as any).increment).to.have.been.calledOnce;
+      expect((stub as any).stop).to.have.been.calledOnce;
     });
   });
 

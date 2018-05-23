@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import * as sinon from "sinon";
 
@@ -21,7 +20,7 @@ import { ProcessingService } from "dashboard/processing.service";
 import { SchemasService } from "dashboard/schemas.service";
 import { UpgradeService } from "dashboard/upgrade.service";
 import { XMLFilesService } from "dashboard/xml-files.service";
-import { waitForSuccess } from "./util";
+import { expectReject, waitForSuccess } from "./util";
 
 //
 // We use any a lot in this code. There's little benefit with doing away with
@@ -83,7 +82,7 @@ describe("ControlComponent", () => {
   // tslint:disable-next-line:mocha-no-side-effect-code
   const packA = JSON.stringify(packAUnserialized);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.sandbox.create();
     fakeConfirmer = sandbox.stub();
     TestBed.configureTestingModule({
@@ -102,38 +101,34 @@ describe("ControlComponent", () => {
       ],
     });
 
-    return TestBed.compileComponents()
-      .then(() => {
-        metadataService = TestBed.get(MetadataService);
-        xmlFilesService = TestBed.get(XMLFilesService);
-        packsService = TestBed.get(PacksService);
-        schemasService = TestBed.get(SchemasService);
-        chunksService = TestBed.get(ChunksService);
+    await TestBed.compileComponents();
+    metadataService = TestBed.get(MetadataService);
+    xmlFilesService = TestBed.get(XMLFilesService);
+    packsService = TestBed.get(PacksService);
+    schemasService = TestBed.get(SchemasService);
+    chunksService = TestBed.get(ChunksService);
 
-        const packPromises = [packA]
-          .map((x) => packsService.makeRecord(packAUnserialized.name, x)
-               .then((record) => packsService.updateRecord(record)));
-        const metadataPromises =
-          [metadataService.makeRecord("metadata", metadata)
-           .then((record) => metadataService.updateRecord(record))];
-        const xmlFilesPromises =
-          [xmlFilesService.makeRecord("xml1", "<div/>")
-           .then((record) => xmlFilesService.updateRecord(record))];
-        const schemasPromises =
-          [schemasService.makeRecord("schema1", "<schema/>")
-           .then((record) => schemasService.updateRecord(record))];
+    const packPromises = [packA]
+      .map((x) => packsService.makeRecord(packAUnserialized.name, x)
+           .then((record) => packsService.updateRecord(record)));
+    const metadataPromises =
+      [metadataService.makeRecord("metadata", metadata)
+       .then((record) => metadataService.updateRecord(record))];
+    const xmlFilesPromises =
+      [xmlFilesService.makeRecord("xml1", "<div/>")
+       .then((record) => xmlFilesService.updateRecord(record))];
+    const schemasPromises =
+      [schemasService.makeRecord("schema1", "<schema/>")
+       .then((record) => schemasService.updateRecord(record))];
 
-        return Promise.all(([] as Promise<{}>[]).concat(packPromises,
-                                                        metadataPromises,
-                                                        xmlFilesPromises,
-                                                        schemasPromises));
-      })
-      .then(() => {
-        fixture = TestBed.createComponent(ControlComponent);
-        component = fixture.componentInstance;
-        de = fixture.debugElement.query(By.css("div"));
-        el = de.nativeElement;
-      });
+    await Promise.all(([] as Promise<{}>[]).concat(packPromises,
+                                                   metadataPromises,
+                                                   xmlFilesPromises,
+                                                   schemasPromises));
+    fixture = TestBed.createComponent(ControlComponent);
+    component = fixture.componentInstance;
+    de = fixture.debugElement.query(By.css("div"));
+    el = de.nativeElement;
   });
 
   afterEach(() => {
@@ -141,56 +136,40 @@ describe("ControlComponent", () => {
     return db.delete().then(() => db.open());
   });
 
-  function dumpAndLoad(clear: boolean): Promise<void> {
+  async function dumpAndLoad(clear: boolean): Promise<void> {
     // We back dump the database, reload it and then compare.
-    return component.dump()
+    const dump = await component.dump();
+
     // Clear if requested...
-      .then((dump) => clear ?
-            Promise.all(db.tables.map((table) => table.clear()))
-            .then(() => dump) :
-            Promise.resolve(dump))
-      .then((dump) => component.load(dump))
-      .then(() => Promise.all([
-                                expect(packsService.getRecordCount())
-                                  .to.eventually.equal(1),
-                                expect(xmlFilesService.getRecordCount())
-                                  .to.eventually.equal(1),
-                                expect(metadataService.getRecordCount())
-                                  .to.eventually.equal(1),
-                                expect(schemasService.getRecordCount())
-                                  .to.eventually.equal(1),
-                              ]))
-      .then(() => Promise.all([
-                                xmlFilesService.getRecordByName("xml1")
-                                  .then((record) => {
-                                    expect(record!.name).to.equal("xml1");
-                                    return expect(record!.getData())
-                                      .to.eventually.equal("<div/>");
-                                  }),
-                                schemasService.getRecordByName("schema1")
-                                  .then((record) => {
-                                    expect(record!.name).to.equal("schema1");
-                                    return expect(record!.getData())
-                                      .to.eventually.equal("<schema/>");
-                                  }),
-                                packsService.getRecordByName("foo")
-                                  .then((record) => {
-                                    expect(record!.name).to.equal("foo");
-                                    expect(record!.mode).to.equal("generic");
-                                    const schema = record!.schema;
-                                    return chunksService.getRecordById(schema)
-                                      .then((chunk) =>
-                                            expect(chunk!.getData()).
-                                            to.eventually.equal("aaa"));
-                                  }),
-                                metadataService.getRecordByName("metadata")
-                                  .then((record) => {
-                                    expect(record!.name).to.equal("metadata");
-                                    return expect(record!.getData())
-                                      .to.eventually.equal(metadata);
-                                  }),
-                              ]))
-      .then(() => undefined);
+    if (clear) {
+      await Promise.all(db.tables.map((table) => table.clear()));
+    }
+
+    await component.load(dump);
+
+    expect(await packsService.getRecordCount()).to.equal(1);
+    expect(await xmlFilesService.getRecordCount()).to.equal(1);
+    expect(await metadataService.getRecordCount()).to.equal(1);
+    expect(await schemasService.getRecordCount()).to.equal(1);
+
+    const xmlRecord = await xmlFilesService.getRecordByName("xml1");
+    expect(xmlRecord!.name).to.equal("xml1");
+    expect(await xmlRecord!.getData()).to.equal("<div/>");
+
+    const schemaRecord = await schemasService.getRecordByName("schema1");
+    expect(schemaRecord!.name).to.equal("schema1");
+    expect(await schemaRecord!.getData()).to.equal("<schema/>");
+
+    const packRecord = await packsService.getRecordByName("foo");
+    expect(packRecord!.name).to.equal("foo");
+    expect(packRecord!.mode).to.equal("generic");
+    const schema = packRecord!.schema;
+    const chunk = await chunksService.getRecordById(schema);
+    expect(await chunk!.getData()).to.equal("aaa");
+
+    const metadataRecord = await metadataService.getRecordByName("metadata");
+    expect(metadataRecord!.name).to.equal("metadata");
+    expect(await metadataRecord!.getData()).to.equal(metadata);
   }
 
   describe("#dump/#load", () => {
@@ -208,175 +187,157 @@ describe("ControlComponent", () => {
 
   describe("#load", () => {
     it("fails on bad data", () =>
-       expect(component.load("{}")).to.be.rejectedWith(
-         Error, "incorrect version number: undefined"));
+       expectReject(component.load("{}"), Error,
+                    "incorrect version number: undefined"));
   });
 
   describe("#download", () => {
-    it("triggers a download with the right data", () => {
+    it("triggers a download with the right data", async () => {
       const stub = sandbox.stub(component, "triggerDownload");
-      return component.dump()
-        .then((dump) => {
-          component.download();
-          return waitForSuccess(
-            () => expect(stub).to.have.been.calledWith("backup", dump));
-        });
+      const dump = await component.dump();
+      component.download();
+      return waitForSuccess(
+        () => expect(stub).to.have.been.calledWith("backup", dump));
     });
   });
 
   describe("#change", () => {
-    it("is a no-op if there are no files", () =>
-      component.change({
-                         target: {
-                           files: undefined,
-                         },
-                       } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.not.been.called;
-        })
-        .then(() => component.change({
-                                       target: {
-                                         files: [],
-                                       },
-                                     } as any))
-        .then(() => {
-          expect(fakeConfirmer).to.have.not.been.called;
-        }));
+    it("is a no-op if there are no files", async () => {
+      await component.change({
+         target: {
+           files: undefined,
+         },
+      } as any);
+
+      expect(fakeConfirmer).to.have.not.been.called;
+
+      await component.change({
+        target: {
+          files: [],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.not.been.called;
+    });
 
     it("throws if there are more than one file", () =>
-      expect(component.change({
-                                target: {
-                                  files: [new File(["one"], "one"),
-                                          new File(["two"], "two")],
-                                },
-                              } as any))
-        .to.be.rejectedWith(
-          Error,
-          "internal error: the control cannot be used for multiple files"));
+       expectReject(
+         component.change({
+           target: {
+             files: [new File(["one"], "one"),
+                     new File(["two"], "two")],
+           },
+         } as any),
+         Error,
+         "internal error: the control cannot be used for multiple files"));
 
-    it("asks for confirmation", () => {
+    it("asks for confirmation", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      return component.change({
-                         target: {
-                           files: [new File(["{}"], "x")],
-                         },
-                              } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-        });
+      await component.change({
+        target: {
+          files: [new File(["{}"], "x")],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.been.called;
     });
 
-    it("does not load if confirmation is denied", () => {
+    it("does not load if confirmation is denied", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
       const stub = sandbox.stub(component, "load");
-      return component.change({
-                                target: {
-                                  files: [new File(["{}"], "x")],
-                                },
-                              } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-          expect(stub).to.not.have.been.called;
-        });
+      await component.change({
+        target: {
+          files: [new File(["{}"], "x")],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.been.called;
+      expect(stub).to.not.have.been.called;
     });
 
-    it("loads if confirmation is given", () => {
+    it("loads if confirmation is given", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
       const stub = sandbox.stub(component, "load");
-      return component.change({
-                                target: {
-                                  files: [new File([emptyDump], "x")],
-                                },
-                              } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-          expect(stub).to.have.been.called;
-        });
+      await component.change({
+        target: {
+          files: [new File([emptyDump], "x")],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.been.called;
+      expect(stub).to.have.been.called;
     });
 
-    it("replaces the data", () => {
+    it("replaces the data", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      return component.change({
-                         target: {
-                           files: [new File([emptyDump], "x")],
-                         },
-                       } as any)
-        .then(() => Promise.all([
-                                  expect(packsService.getRecordCount())
-                                    .to.eventually.equal(0),
-                                  expect(xmlFilesService.getRecordCount())
-                                    .to.eventually.equal(0),
-                                  expect(metadataService.getRecordCount())
-                                    .to.eventually.equal(0),
-                                  expect(schemasService.getRecordCount())
-                                    .to.eventually.equal(0),
-                                ]));
-      });
+      await component.change({
+        target: {
+          files: [new File([emptyDump], "x")],
+        },
+      } as any);
 
-    it("uses the processing service", () => {
-      fakeConfirmer.returns(Promise.resolve(true));
-      const stub = sandbox.stub(FakeProcessingService.prototype);
-      return component.change({
-                                target: {
-                                  files: [new File([emptyDump], "x")],
-                                },
-                              } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.calledOnce;
-          expect((stub as any).start).to.have.been.calledOnce;
-          expect((stub as any).start).to.have.been.calledWith(1);
-          expect((stub as any).increment).to.have.been.calledOnce;
-          expect((stub as any).stop).to.have.been.calledOnce;
-        });
+      expect(await packsService.getRecordCount()).to.equal(0);
+      expect(await xmlFilesService.getRecordCount()).to.equal(0);
+      expect(await metadataService.getRecordCount()).to.equal(0);
+      expect(await schemasService.getRecordCount()).to.equal(0);
     });
 
-    it("shows an alert if the data is incorrect", () => {
+    it("uses the processing service", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
       const stub = sandbox.stub(FakeProcessingService.prototype);
-      return component.change({
-                                target: {
-                                  files: [new File(["{}"], "x")],
-                                },
-                              } as any)
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.calledOnce;
-          expect((stub as any).start).to.have.been.calledOnce;
-          expect((stub as any).start).to.have.been.calledWith(1);
-          // Increment is not called due to the error.
-          expect((stub as any).increment).to.not.have.been.called;
-          expect((stub as any).stop).to.have.been.calledOnce;
-          expect(document.getElementsByClassName("bootbox-alert"))
-            .to.have.property("length").greaterThan(0);
-        });
+      await component.change({
+        target: {
+          files: [new File([emptyDump], "x")],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.been.calledOnce;
+      expect((stub as any).start).to.have.been.calledOnce;
+      expect((stub as any).start).to.have.been.calledWith(1);
+      expect((stub as any).increment).to.have.been.calledOnce;
+      expect((stub as any).stop).to.have.been.calledOnce;
+    });
+
+    it("shows an alert if the data is incorrect", async () => {
+      fakeConfirmer.returns(Promise.resolve(true));
+      const stub = sandbox.stub(FakeProcessingService.prototype);
+      await component.change({
+        target: {
+          files: [new File(["{}"], "x")],
+        },
+      } as any);
+
+      expect(fakeConfirmer).to.have.been.calledOnce;
+      expect((stub as any).start).to.have.been.calledOnce;
+      expect((stub as any).start).to.have.been.calledWith(1);
+      // Increment is not called due to the error.
+      expect((stub as any).increment).to.not.have.been.called;
+      expect((stub as any).stop).to.have.been.calledOnce;
+      expect(document.getElementsByClassName("bootbox-alert"))
+        .to.have.property("length").greaterThan(0);
     });
   });
 
   describe("#clear", () => {
-    it("asks for confirmation", () => {
+    it("asks for confirmation", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      return component.clear()
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-        });
+      await component.clear();
+      expect(fakeConfirmer).to.have.been.called;
     });
 
-    it("does not clear if confirmation is denied", () => {
+    it("does not clear if confirmation is denied", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      return component.clear()
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-          return expect(packsService.getRecordCount()).to.eventually.equal(1);
-        });
+      await component.clear();
+      expect(fakeConfirmer).to.have.been.called;
+      expect(await packsService.getRecordCount()).to.equal(1);
     });
 
-    it("clears if confirmation is given", () => {
+    it("clears if confirmation is given", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      return expect(packsService.getRecordCount()).to.eventually.not.equal(0)
-        .then(() => component.clear())
-        .then(() => {
-          expect(fakeConfirmer).to.have.been.called;
-          return expect(packsService.getRecordCount()).to.eventually.equal(0);
-        });
+      expect(await packsService.getRecordCount()).to.not.equal(0);
+      await component.clear();
+      expect(fakeConfirmer).to.have.been.called;
+      expect(await packsService.getRecordCount()).to.equal(0);
     });
   });
 

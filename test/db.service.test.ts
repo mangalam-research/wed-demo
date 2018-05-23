@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import { first } from "rxjs/operators/first";
 import * as sinon from "sinon";
@@ -17,6 +16,8 @@ import { db } from "dashboard/store";
 import { XMLFile } from "dashboard/xml-file";
 import { XMLFilesService } from "dashboard/xml-files.service";
 
+import { expectReject } from "./util";
+
 describe("DBService", () => {
   let chunksService: ChunksService;
   let service: XMLFilesService;
@@ -27,8 +28,8 @@ describe("DBService", () => {
     service = new XMLFilesService(chunksService);
   });
 
-  beforeEach(() => {
-    return service.makeRecord("foo", "bar").then((newFile) => file = newFile);
+  beforeEach(async () => {
+    file = await service.makeRecord("foo", "bar");
   });
 
   afterEach(() => db.delete().then(() => db.open()));
@@ -45,297 +46,271 @@ describe("DBService", () => {
 
   describe("#getRecords", () => {
     it("returns [] when the table is empty",
-       () => expect(service.getRecords()).to.eventually.deep.equal([]));
+       async () => expect(await service.getRecords()).to.deep.equal([]));
 
-    it("returns an array of results", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => expect(records).to.deep.equal([file])));
+    it("returns an array of results", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecords()).to.deep.equal([file]);
+    });
   });
 
   describe("#deleteRecord", () => {
-    it("deletes a record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => expect(records).to.deep.equal([file]))
-       .then(() => service.deleteRecord(file))
-       .then(() => expect(service.getRecords())
-             .to.eventually.deep.equal([])));
+    it("deletes a record", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecords()).to.deep.equal([file]);
+      await service.deleteRecord(file);
+      expect(await service.getRecords()).to.deep.equal([]);
+    });
 
-    it("emits a modification", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => expect(records).to.deep.equal([file]))
-       .then(() => {
-         const ret = service.change.pipe(first()).toPromise();
-         // It does not matter if the next promise is "lost". We're simulating
-         // some other code causing a change.
-         service.deleteRecord(file) as {};
-         return ret;
-        }));
+    it("emits a modification", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecords()).to.deep.equal([file]);
+
+      const ret = service.change.pipe(first()).toPromise();
+      // It does not matter if the next promise is "lost". We're simulating
+      // some other code causing a change.
+      service.deleteRecord(file) as {};
+      return ret;
+    });
 
     it("throws if the record has no id", () => {
       expect(file).to.not.have.property("id");
-      return expect(service.deleteRecord(file))
-        .to.be.rejectedWith(Error, /missing id/);
+      return expectReject(service.deleteRecord(file), Error, /missing id/);
     });
   });
 
   describe("#updateRecord", () => {
-    it("adds the record, if it does not yet exist", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => expect(records).to.deep.equal([file])));
+    it("adds the record, if it does not yet exist", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecords()).to.deep.equal([file]);
+    });
 
-    it("changes the record, if it already exists", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordById(file.id!))
-       .then((record) => expect(record).to.deep.equal(file))
-       .then(() => {
-          file.name = "q";
-          return service.updateRecord(file);
-        })
-       .then(() => service.getRecordById(file.id!))
-       .then((record) => expect(record).to.deep.equal(file)));
+    it("changes the record, if it already exists", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecordById(file.id!)).to.deep.equal(file);
+      file.name = "q";
+      await service.updateRecord(file);
+      expect(await service.getRecordById(file.id!)).to.deep.equal(file);
+    });
 
-    it("emits a modification", () =>
-       Promise.resolve().then(() => {
-         const ret = service.change.pipe(first()).toPromise();
-         // It does not matter if the next promise is "lost". We're simulating
-         // some other code causing a change.
-         service.updateRecord(file) as {};
-         return ret;
-       }));
+    it("emits a modification", () => {
+      const ret = service.change.pipe(first()).toPromise();
+      // It does not matter if the next promise is "lost". We're simulating
+      // some other code causing a change.
+      service.updateRecord(file) as {};
+      return ret;
+    });
 
-    it("updates the record id, if it was undefined", () => {
+    it("updates the record id, if it was undefined", async () => {
       expect(file).to.not.have.property("id");
-      return service.updateRecord(file)
-        .then(() => expect(file).to.have.property("id").not.be.undefined);
+      await service.updateRecord(file);
+      expect(file).to.have.property("id").not.be.undefined;
     });
   });
 
   describe("#getRecordById", () => {
-    it("gets the specified record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordById(file.id!))
-       .then((record) => expect(record).to.deep.equal(file)));
+    it("gets the specified record", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecordById(file.id!)).to.deep.equal(file);
+    });
 
-    it("gets undefined if the record does not exist", () =>
-       expect(service.getRecordById(999),
-              "the record should not exist").to.eventually.be.undefined);
+    it("gets undefined if the record does not exist", async () =>
+       expect(await service.getRecordById(999),
+              "the record should not exist").to.be.undefined);
   });
 
   describe("#getRecordByName", () => {
-    it("gets the specified record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordByName(file.name))
-       .then((record) => expect(record).to.deep.equal(file)));
+    it("gets the specified record", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecordByName(file.name)).to.deep.equal(file);
+    });
 
-    it("gets undefined if the record does not exist", () =>
-       expect(service.getRecordByName("nonexistent"),
-              "the record should not exist").to.eventually.be.undefined);
+    it("gets undefined if the record does not exist", async () =>
+       expect(await service.getRecordByName("nonexistent"),
+              "the record should not exist").to.be.undefined);
   });
 
   describe("#loadFromFile", () => {
-    it("loads into a new record, when no record is specified", () => {
-      function check(record: XMLFile): Promise<void> {
+    it("loads into a new record, when no record is specified", async () => {
+      async function check(record: XMLFile): Promise<void> {
         expect(record).to.have.property("id").not.be.undefined;
         expect(record).to.have.property("name").equal("foo");
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("something") as any;
+        expect(await record.getData()).to.equal("something");
       }
 
-      return service.loadFromFile(new File(["something"], "foo"))
-        .then(check)
-        .then(() => service.getRecordByName("foo"))
-        .then((record) => check(record!));
+      await check(await service.loadFromFile(new File(["something"], "foo")));
+      await check((await service.getRecordByName("foo"))!);
     });
 
-    it("loads into an existing record", () => {
-      function check(record: XMLFile): Promise<void> {
+    it("loads into an existing record", async () => {
+      async function check(record: XMLFile): Promise<void> {
         expect(record).to.have.property("id").not.be.undefined;
         // The name of the File object was ignored.
         expect(record).to.have.property("name").equal("foo");
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("something") as any;
+        expect(await record.getData()).to.equal("something");
       }
 
-      return service.updateRecord(file)
-        .then(() => service.loadFromFile(new File(["something"], "newfile"),
-                                         file))
-        .then(check)
-        .then(() => service.getRecordByName("foo"))
-        .then((record) => check(record!));
+      await service.updateRecord(file);
+      await check(await service.loadFromFile(new File(["something"], "newfile"),
+                                             file));
+      await check((await service.getRecordByName("foo"))!);
     });
   });
 
   describe("#writeCheck", () => {
     describe("when there is no conflict", () => {
-      it("returns { write: true, record: null }",
-         () => expect(service.writeCheck(file.name, () => {
-           throw new Error("called");
-         })).to.eventually.deep.equal({write: true, record: null}));
+      it("returns { write: true, record: null }", async () => {
+        expect(await service.writeCheck(file.name, () => {
+          throw new Error("called");
+        })).to.deep.equal({write: true, record: null});
+      });
     });
 
     describe("when there is a conflict", () => {
       it("returns { write: false, record: <some record>} if the user declined",
-         () => {
+         async () => {
            const stub = sinon.stub();
            stub.returns(Promise.resolve(false));
-           return service.updateRecord(file)
-             .then(() => service.writeCheck(file.name, stub))
-             .then((response) => expect(response)
-                   .to.deep.equal({ write: false, record: file }))
-             .then(() => expect(stub).to.have.been.calledOnce);
+           await service.updateRecord(file);
+           expect(await service.writeCheck(file.name, stub))
+             .to.deep.equal({ write: false, record: file });
+           expect(stub).to.have.been.calledOnce;
          });
 
       it("returns { write: true, record: <some record>} if the user accepted",
-         () => {
+         async () => {
            const stub = sinon.stub();
            stub.returns(Promise.resolve(true));
-           return service.updateRecord(file)
-             .then(() => service.writeCheck(file.name, stub))
-             .then((response) => expect(response)
-                   .to.deep.equal({ write: true, record: file }))
-             .then(() => expect(stub).to.have.been.calledOnce);
+           await service.updateRecord(file);
+           expect(await service.writeCheck(file.name, stub))
+             .to.deep.equal({ write: true, record: file });
+           expect(stub).to.have.been.calledOnce;
          });
     });
   });
 
   describe("#safeLoadFromFile", () => {
-    it("loads into an existing record", () => {
-      function check(record: XMLFile): Promise<void> {
+    it("loads into an existing record", async () => {
+      async function check(record: XMLFile): Promise<void> {
         expect(record).to.have.property("id").not.be.undefined;
         // The name of the File object was ignored.
         expect(record).to.have.property("name").equal("foo");
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("something") as any;
+        expect(await record.getData()).to.equal("something");
       }
 
-      return service.updateRecord(file)
-        .then(() => service.safeLoadFromFile(new File(["something"], "newfile"),
-                                             file))
-        .then((record) => check(record!))
-        .then(() => service.getRecordByName("foo"))
-        .then((record) => check(record!));
+      await service.updateRecord(file);
+      await check((await service.safeLoadFromFile(new File(["something"],
+                                                           "newfile"),
+                                                  file))!);
+      await check((await service.getRecordByName("foo"))!);
     });
 
-    it("loads into a new record if the file name does not exist", () => {
-      function check(record: XMLFile): Promise<void> {
+    it("loads into a new record if the file name does not exist", async () => {
+      async function check(record: XMLFile): Promise<void> {
         expect(record).to.have.property("id").not.be.undefined;
         expect(record).to.have.property("name").equal("newfile");
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("something") as any;
+        expect(await record.getData()).to.equal("something");
       }
 
-      return service.safeLoadFromFile(new File(["something"], "newfile"),
-                                      () => {
-                                        throw new Error("stub called");
-                                      })
-        .then((record) => check(record!))
-        .then(() => service.getRecordByName("newfile"))
-        .then((record) => check(record!));
+      await check(
+        (await service.safeLoadFromFile(new File(["something"], "newfile"),
+                                       () => {
+                                         throw new Error("stub called");
+                                       }))!);
+      await check((await service.getRecordByName("newfile"))!);
     });
 
-    it("loads into the an existing record if the user accepts", () => {
-      function check(record: XMLFile): Promise<void> {
+    it("loads into the an existing record if the user accepts", async () => {
+      async function check(record: XMLFile): Promise<void> {
         expect(record).to.have.property("id").equal(file.id);
         expect(record).to.have.property("name").equal(file.name);
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("something") as any;
+        expect(await record.getData()).to.equal("something");
       }
 
       let asked = false;
       // Make sure we start with data different from what we're
       // going to set the file to.
-      return expect(file.getData()).to.eventually.not.be.equal("something")
-        .then(() => service.updateRecord(file))
-        .then(async () => {
-          const record = await service.safeLoadFromFile
-          (new File(["something"],
-                    file.name),
-           () => {
-             asked = true;
-             return Promise.resolve(true);
-           });
-          return check(record!);
-        })
-        .then(async () => {
-          const record = await service.getRecordByName(file.name);
-          return check(record!);
-        })
-        .then(() => expect(service.getRecordCount()).to.eventually.equal(1))
-        .then(() => expect(asked, "should have asked").to.be.true);
+      expect(await file.getData()).to.not.be.equal("something");
+
+      await service.updateRecord(file);
+
+      await check(
+        (await service.safeLoadFromFile(new File(["something"], file.name),
+                                        () => {
+                                          asked = true;
+                                          return Promise.resolve(true);
+                                        }))!);
+      await check((await service.getRecordByName(file.name))!);
+      expect(await service.getRecordCount()).to.equal(1);
+      expect(asked, "should have asked").to.be.true;
     });
 
-    it("does not load if the user rejects", () => {
-      function check(record: XMLFile): Promise<void> {
-        expect(record).to.have.property("id").equal(file.id);
-        expect(record).to.have.property("name").equal(file.name);
-        // tslint:disable-next-line:no-any
-        return expect(record.getData()).to.eventually.equal("bar") as any;
+    it("does not load if the user rejects", async () => {
+      async function check(toCheck: XMLFile): Promise<void> {
+        expect(toCheck).to.have.property("id").equal(file.id);
+        expect(toCheck).to.have.property("name").equal(file.name);
+        expect(await toCheck.getData()).to.equal("bar");
       }
 
       let asked = false;
 
       // Make sure we start with data different from what we're
       // going to set the file to.
-      return expect(file.getData()).to.eventually.not.be.equal("something")
-        .then(() => service.updateRecord(file))
-        .then(() => service.safeLoadFromFile(new File(["something"],
-                                                      file.name),
-                                             () => {
-                                               asked = true;
-                                               return Promise.resolve(false);
-                                             }))
-        .then((record) =>
-              expect(record, "should not have found a record").to.be.undefined)
-        .then(async () => check((await service.getRecordByName(file.name))!))
-        .then(() => expect(service.getRecordCount()).to.eventually.equal(1))
-        .then(() => expect(asked, "should have asked").to.be.true);
+      expect(await file.getData()).to.not.be.equal("something");
+
+      await service.updateRecord(file);
+      const record =
+        await service.safeLoadFromFile(new File(["something"], file.name),
+                                       () => {
+                                         asked = true;
+                                         return Promise.resolve(false);
+                                       });
+      expect(record, "should not have found a record").to.be.undefined;
+      await check((await service.getRecordByName(file.name))!);
+      expect(await service.getRecordCount()).to.equal(1);
+      expect(asked, "should have asked").to.be.true;
     });
   });
 
   describe("#clear", () => {
-    it("clears the database", () =>
-       service.updateRecord(file)
-       .then(() => expect(service.getRecordCount()).to.eventually.equal(1))
-       .then(() => service.clear())
-       .then(() => expect(service.getRecordCount()).to.eventually.equal(0)));
+    it("clears the database", async () => {
+      await service.updateRecord(file);
+      expect(await service.getRecordCount()).to.equal(1);
+      await service.clear();
+      expect(await service.getRecordCount()).to.equal(0);
+    });
 
-    it("emits a modification", () =>
-       service.updateRecord(file).then(() => {
-         const ret = service.change.pipe(first()).toPromise();
-         // It does not matter if the next promise is "lost". We're simulating
-         // some other code causing a change.
-         service.clear() as {};
-         return ret;
-       }));
+    it("emits a modification", async () => {
+      await service.updateRecord(file);
+      const ret = service.change.pipe(first()).toPromise();
+      // It does not matter if the next promise is "lost". We're simulating
+      // some other code causing a change.
+      service.clear() as {};
+      return ret;
+    });
   });
 
   describe("#getNameIdArray", () => {
-    it("provides an empty array when the database is empty", () =>
-       expect(service.getNameIdArray()).to.eventually.deep.equal([]));
+    it("provides an empty array when the database is empty", async () =>
+       expect(await service.getNameIdArray()).to.deep.equal([]));
 
-    it("provides a filled array when there are records", () => Promise.resolve()
-       .then(() => loadRecords(3))
-       .then((records) => records.map((record) => ({
-         name: record.name,
-         id: record.id,
-       })))
-       .then((expected) => {
-         expect(expected).to.have.length.above(0);
-         expect(service.getNameIdArray()).to.eventually.deep.equal(expected);
-       }));
+    it("provides a filled array when there are records", async () => {
+      const expected = (await loadRecords(3)).map((record) => ({
+        name: record.name,
+        id: record.id,
+      }));
+      expect(expected).to.have.length.above(0);
+      expect(await service.getNameIdArray()).to.deep.equal(expected);
+    });
   });
 
   describe("#getRecordCount()", () => {
-    it("provides a count of 0 when the database is empty", () =>
-       expect(service.getRecordCount()).to.eventually.equal(0));
+    it("provides a count of 0 when the database is empty", async () =>
+       expect(await service.getRecordCount()).to.equal(0));
 
-    it("provides the count of records", () => Promise.resolve()
-       .then(() => loadRecords(3))
-       .then(() => expect(service.getRecordCount())
-             .to.eventually.deep.equal(3)));
+    it("provides the count of records", async () => {
+      await loadRecords(3);
+      expect(await service.getRecordCount()).to.deep.equal(3);
+    });
   });
 });

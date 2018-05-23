@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -24,21 +23,22 @@ describe("Chunk", () => {
          }));
 
   it("has recordType which is 'Chunk'",
-     () => expect(one.recordType).to.equal("Chunk"));
+     async () => expect(one.recordType).to.equal("Chunk"));
 
   it("has a defined id",
-     () => expect(one).to.have.property("id").not.be.undefined);
+     async () => expect(one).to.have.property("id").not.be.undefined);
 
   it("has the right content",
-     () => expect(one.getData()).to.eventually.equal("content"));
+     async () => expect(await one.getData()).to.equal("content"));
 
   it("two chunks have the same id for the same content",
-     () => expect(one.id).to.equal(same.id));
+     async () => expect(one.id).to.equal(same.id));
 
   it("two chunks have different ids for different content",
-     () => expect(one.id).to.not.equal(different.id));
+     async () => expect(one.id).to.not.equal(different.id));
 
-  it("can be created from a string", () =>
-     Chunk.makeChunk("string")
-     .then((chunk) => expect(chunk.getData()).to.eventually.equal("string")));
+  it("can be created from a string", async () => {
+    const chunk = await Chunk.makeChunk("string");
+    expect(await chunk.getData()).to.equal("string");
+  });
 });

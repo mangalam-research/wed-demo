@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
@@ -146,14 +145,11 @@ describe("XMLFilesComponent", () => {
     return fixture.whenStable();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fixture.detectChanges();
-    return fixture.whenStable()
-      .then(() => {
-        fixture.destroy();
-      })
-      .then(() => db.delete())
-      .then(() => db.open());
+    await fixture.whenStable();
+    fixture.destroy();
+    await db.delete().then(() => db.open());
   });
 
   function makeNavigationURL(record: XMLFile, pack: Pack): string {
@@ -241,9 +237,9 @@ describe("XMLFilesComponent", () => {
       await component.newFile();
       expect(writeStub.callCount).to.equal(1);
       expect(updateSpy.callCount).to.equal(1);
-      return expect(recordsService.getRecordByName(records[0].name)
-                    .then((record) => record!.getData()))
-        .to.eventually.equal("");
+      expect(await recordsService.getRecordByName(records[0].name)
+             .then((record) => record!.getData()))
+        .to.equal("");
     });
   });
 
@@ -251,16 +247,16 @@ describe("XMLFilesComponent", () => {
     describe("#editable", () => {
       it("returns false when the record has nopack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editable
-                      .pipe(first()).toPromise())
-          .to.eventually.be.false;
+        expect(await component.getEditingData(record!).editable
+               .pipe(first()).toPromise())
+          .to.be.false;
       });
 
       it("returns true when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editable
+        expect(await component.getEditingData(record!).editable
                       .pipe(first()).toPromise())
-          .to.eventually.be.true;
+          .to.be.true;
       });
     });
 
@@ -285,25 +281,25 @@ describe("XMLFilesComponent", () => {
     describe("#editButtonTitle", () => {
       it("returns the correct title when the record has no pack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).editButtonTitle
-                      .pipe(first()).toPromise())
-          .to.eventually.equal("This file needs a pack before editing.");
+        expect(await component.getEditingData(record!).editButtonTitle
+               .pipe(first()).toPromise())
+          .to.equal("This file needs a pack before editing.");
       });
 
       it("returns the correct title when the record has a pack", async () => {
         const record = await recordsService.getRecordByName("a");
-        return expect(component.getEditingData(record!).editButtonTitle
-                      .pipe(first()).toPromise())
-          .to.eventually.equal("Edit with pack foo");
+        expect(await component.getEditingData(record!).editButtonTitle
+               .pipe(first()).toPromise())
+          .to.equal("Edit with pack foo");
       });
     });
 
     describe("#getPack", () => {
       it("returns undefined the record has no pack", async () => {
         const record = await recordsService.getRecordByName("b");
-        return expect(component.getEditingData(record!).associatedPack
-                      .pipe(first()).toPromise())
-          .to.eventually.be.undefined;
+        expect(await component.getEditingData(record!).associatedPack
+               .pipe(first()).toPromise())
+          .to.be.undefined;
       });
 
       it("returns the pack when the record has a manual pack", async () => {

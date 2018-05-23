@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
@@ -79,7 +78,7 @@ describe("PacksComponent", () => {
   // tslint:disable-next-line:mocha-no-side-effect-code
   const state: ComponentTestState = Object.create(null);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.sandbox.create();
     fakeConfirmer = sandbox.stub();
     fakeConfirmer.returns(Promise.resolve(true));
@@ -99,31 +98,26 @@ describe("PacksComponent", () => {
       ],
     });
 
-    return TestBed.compileComponents()
-      .then(() => {
-        packsService = TestBed.get(PacksService);
-        xmlFilesService = TestBed.get(XMLFilesService);
+    await TestBed.compileComponents();
+    packsService = TestBed.get(PacksService);
+    xmlFilesService = TestBed.get(XMLFilesService);
 
-        return Promise.all(
-          [packA, packB]
-            .map((x) => packsService.makeRecord("", x)
-                 .then((record) => packsService.updateRecord(record))))
-          .then((newRecords) => records = newRecords);
-      })
-      .then(() => {
-        fixture = TestBed.createComponent(PacksComponent);
-        component = fixture.componentInstance;
-        de = fixture.debugElement.query(By.css("div"));
-        el = de.nativeElement;
-        state.component = component;
-        state.fixture = fixture;
-        state.el = el;
-        state.recordsService = packsService;
-        state.sandbox = sandbox;
-      })
+    records = await Promise.all(
+      [packA, packB]
+        .map(async (x) =>
+             packsService.updateRecord(await packsService.makeRecord("", x))));
+    fixture = TestBed.createComponent(PacksComponent);
+    component = fixture.componentInstance;
+    de = fixture.debugElement.query(By.css("div"));
+    el = de.nativeElement;
+    state.component = component;
+    state.fixture = fixture;
+    state.el = el;
+    state.recordsService = packsService;
+    state.sandbox = sandbox;
     // Wait until the component has refreshed.
-      .then(() => waitFor(() => component.records != null &&
-                          component.records.length !== 0));
+    await waitFor(() => component.records != null &&
+                  component.records.length !== 0);
   });
 
   afterEach(() => db.delete().then(() => db.open()));
@@ -135,64 +129,57 @@ describe("PacksComponent", () => {
 
   describe("#del", () => {
     describe("when the pack is not used", () => {
-      it("asks for a generic confirmation", () => {
+      it("asks for a generic confirmation", async () => {
         fakeConfirmer.returns(Promise.resolve(true));
-        return component.del(records[0])
-          .then(() => {
-            expect(fakeConfirmer).to.have.been.calledOnce;
-            expect(fakeConfirmer)
-              .to.have.been.calledWith("Do you really want to delete \"foo\"?");
-          });
+        await component.del(records[0]);
+        expect(fakeConfirmer).to.have.been.calledOnce;
+        expect(fakeConfirmer)
+          .to.have.been.calledWith("Do you really want to delete \"foo\"?");
       });
     });
 
     describe("when the pack is used", () => {
       let xmlFile: XMLFile;
-      beforeEach(() => xmlFilesService.makeRecord("xml1", "<div/>")
-                 .then((record) => {
-                   record.pack = records[0].id;
-                   return xmlFilesService.updateRecord(record);
-                 }).then((record) => xmlFile = record));
+      beforeEach(async () => {
+        const record = await xmlFilesService.makeRecord("xml1", "<div/>");
+        record.pack = records[0].id;
+        xmlFile = await xmlFilesService.updateRecord(record);
+      });
 
-      it("asks for a special confirmation", () => {
+      it("asks for a special confirmation", async () => {
         fakeConfirmer.returns(Promise.resolve(true));
-        return component.del(records[0])
-          .then(() => {
-            expect(fakeConfirmer).to.have.been.calledOnce;
-            expect(fakeConfirmer)
-              .to.have.been.calledWith(`\
+        await component.del(records[0]);
+        expect(fakeConfirmer).to.have.been.calledOnce;
+        expect(fakeConfirmer)
+          .to.have.been.calledWith(`\
 This pack is used by some XML files. If you delete it, the pack \
 set for the files that use it will be reset and you will have to reassociated \
 the files with this pack. Do you really want to delete "foo"?`);
-          });
       });
 
-      it("does not delete or modify XML files if denied confirmation", () => {
-        fakeConfirmer.returns(Promise.resolve(false));
-        return component.del(records[0])
-          .then(() => {
-            expect(fakeConfirmer).to.have.been.calledOnce;
-            // Pack not deleted.
-            expect(component.records).to.have.lengthOf(2);
-            return expect(xmlFilesService.getRecordByName("xml1"))
-              .to.eventually.deep.equal(xmlFile);
-          });
-      });
+      it("doesn't delete or modify XML files if denied confirmation",
+         async () => {
+           fakeConfirmer.returns(Promise.resolve(false));
+           await component.del(records[0]);
+           expect(fakeConfirmer).to.have.been.calledOnce;
+           // Pack not deleted.
+           expect(component.records).to.have.lengthOf(2);
+           expect(await xmlFilesService.getRecordByName("xml1"))
+             .to.deep.equal(xmlFile);
+         });
 
-      it("deletes pack and modifies XML files if granted confirmation", () => {
-        fakeConfirmer.returns(Promise.resolve(true));
-        return component.del(records[0])
-          .then(() => {
-            expect(fakeConfirmer).to.have.been.calledOnce;
-          })
-        // Pack deleted.
-          .then(() =>
-                waitForSuccess(() =>
-                               expect(component.records).to.have.lengthOf(1)))
-        // xml file updated.
-          .then(() => expect(xmlFilesService.getRecordByName("xml1"))
-                .to.eventually.have.property("pack").be.undefined);
-      });
+      it("deletes pack and modifies XML files if granted confirmation",
+         async () => {
+           fakeConfirmer.returns(Promise.resolve(true));
+           await component.del(records[0]);
+           expect(fakeConfirmer).to.have.been.calledOnce;
+           // Pack deleted.
+           await waitForSuccess(() =>
+                                expect(component.records).to.have.lengthOf(1));
+           // xml file updated.
+           expect(await xmlFilesService.getRecordByName("xml1"))
+                .to.have.property("pack").be.undefined;
+         });
     });
   });
 });

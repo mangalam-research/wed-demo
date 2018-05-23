@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
@@ -12,6 +11,8 @@ import { db } from "dashboard/store";
 
 import { Chunk } from "dashboard/chunk";
 import { XMLFile } from "dashboard/xml-file";
+
+import { expectReject } from "./util";
 
 // We use XMLFile to test ChunkedRecord.
 describe("ChunkedRecord", () => {
@@ -46,13 +47,13 @@ describe("ChunkedRecord", () => {
   });
 
   it("#chunk is correct",
-     () => expect(one.chunk).to.equal(chunkOne.id));
+     async () => expect(one.chunk).to.equal(chunkOne.id));
 
   it("#data is correct",
-     () => expect(one.getData()).to.eventually.equal("content"));
+     async () => expect(await one.getData()).to.equal("content"));
 
   it("#data raise an error if the chunk is non-existent",
-     () => expect(bad.getData()).to.be.rejectedWith(Error, /missing chunk/));
+     () => expectReject(bad.getData(), Error, /missing chunk/));
 
   it("#data caches db accesses", () => {
     const spy = sandbox.spy(db.chunks, "get");

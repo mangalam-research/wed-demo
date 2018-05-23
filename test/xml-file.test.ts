@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -13,28 +12,25 @@ describe("XMLFile", () => {
   let chunkOne: Chunk;
   let one: XMLFile;
 
-  before(() => {
-    return Promise.all(
-      [Chunk.makeChunk(new File(["content"], "a"))])
-      .then((chunks) => Promise.all(chunks.map((x) => db.chunks.put(x)))
-            .then(() => chunks))
-      .then(([newChunk]) => {
-        chunkOne = newChunk;
-        one = new XMLFile("a", chunkOne.id);
-      });
+  before(async () => {
+    const chunks =
+      await Promise.all([Chunk.makeChunk(new File(["content"], "a"))]);
+    await Promise.all(chunks.map((x) => db.chunks.put(x)));
+    [chunkOne] = chunks;
+    one = new XMLFile("a", chunkOne.id);
   });
 
   after(() => db.delete().then(() => db.open()));
 
   it("#recordType is 'XMLFile'",
-     () => expect(one.recordType).to.equal("XMLFile"));
+     async () => expect(one.recordType).to.equal("XMLFile"));
 
   it("#saved is set to 'never'",
-     () => expect(one.saved).to.equal("never"));
+     async () => expect(one.saved).to.equal("never"));
 
   it("#chunk is correct",
-     () => expect(one.chunk).to.equal(chunkOne.id));
+     async () => expect(one.chunk).to.equal(chunkOne.id));
 
   it("#data is correct",
-     () => expect(one.getData()).to.eventually.equal("content"));
+     async () => expect(await one.getData()).to.equal("content"));
 });

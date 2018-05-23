@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -11,7 +10,7 @@ describe("Pack", () => {
   const one = new Pack("a");
 
   it("has recordType which is 'Pack'",
-     () => expect(one.recordType).to.equal("Pack"));
+     async () => expect(one.recordType).to.equal("Pack"));
 
   it("takes a payload",
      () => {

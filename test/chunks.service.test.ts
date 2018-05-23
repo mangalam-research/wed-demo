@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -9,6 +8,8 @@ import { db } from "dashboard/store";
 import { Chunk } from "dashboard/chunk";
 import { ChunksService } from "dashboard/chunks.service";
 import { readFile } from "dashboard/store-util";
+
+import { expectReject } from "./util";
 
 describe("ChunksService", () => {
   let service: ChunksService;
@@ -23,54 +24,50 @@ describe("ChunksService", () => {
     return Promise.all(promises);
   }
 
-  function assertEqualChunks(a: Chunk, b: Chunk): Promise<void> {
+  async function assertEqualChunks(a: Chunk, b: Chunk): Promise<void> {
     // Access data on both objects so that they become fit for a deep.equal.
-    return Promise.all([a.getData(), b.getData()])
-      .then(() => {
-        expect(a).to.deep.equal(b);
-      });
+    await Promise.all([a.getData(), b.getData()]);
+    expect(a).to.deep.equal(b);
   }
 
-  function assertEqualLists(a: Chunk[], b: Chunk[]): Promise<void> {
+  async function assertEqualLists(a: Chunk[], b: Chunk[]): Promise<void> {
     expect(a.length).to.equal(b.length);
     // Access data in both lists so that they become fit for a deep.equal.
     const promises: Promise<string>[] = [];
     for (let ix = 0; ix < a.length; ++ix) {
       promises.push(a[ix].getData(), b[ix].getData());
     }
-    return Promise.all(promises).then(() => {
-      expect(a).to.deep.equal(b);
-    });
+    await Promise.all(promises);
+    expect(a).to.deep.equal(b);
   }
 
   before(() => {
     service = new ChunksService();
   });
 
-  beforeEach(
-    () => Chunk.makeChunk(new File(["foo"], "foo"))
-      .then((chunk) => file = chunk));
+  beforeEach(async () => {
+    file = await Chunk.makeChunk(new File(["foo"], "foo"));
+  });
 
   afterEach(() => db.delete().then(() => db.open()));
 
   describe("#getRecords", () => {
-    it("returns [] when the table is empty", () =>
-       expect(service.getRecords()).to.eventually.deep.equal([]));
+    it("returns [] when the table is empty", async () =>
+       expect(await service.getRecords()).to.deep.equal([]));
 
-    it("returns an array of results", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((chunks) => assertEqualLists(chunks, [file])));
+    it("returns an array of results", async () => {
+      await service.updateRecord(file);
+      await assertEqualLists(await service.getRecords(), [file]);
+    });
   });
 
   describe("#deleteRecord", () => {
-    it("deletes a record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecords())
-       .then((records) => assertEqualLists(records, [file]))
-       .then(() => service.deleteRecord(file))
-       .then(() => service.getRecords())
-       .then((records) => assertEqualLists(records, [])));
+    it("deletes a record", async () => {
+      await service.updateRecord(file);
+      await assertEqualLists(await service.getRecords(), [file]);
+      await service.deleteRecord(file);
+      await assertEqualLists(await service.getRecords(), []);
+    });
   });
 
   describe("#updateRecord", () => {
@@ -86,71 +83,65 @@ describe("ChunksService", () => {
        .then(() => {
          // tslint:disable-next-line:no-any
          (file as any).file = new File(["something else"], "a");
-         return expect(service.updateRecord(file))
-           .to.be.rejectedWith(Error, /trying to update chunk with id/);
+         return expectReject(service.updateRecord(file),
+                             Error, /trying to update chunk with id/);
        }));
 
-    it("is a no-op on an existing, unchaged record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record!, file))
-       .then(() => expect(service.updateRecord(file))
-             .to.eventually.deep.equal(file)));
+    it("is a no-op on an existing, unchaged record", async () => {
+      await service.updateRecord(file);
+      await assertEqualChunks((await service.getRecordById(file.id))!, file);
+      expect(await service.updateRecord(file)).to.deep.equal(file);
+    });
 });
 
   describe("#getRecordById", () => {
-    it("gets the specified record", () =>
-       service.updateRecord(file)
-       .then(() => service.getRecordById(file.id))
-       .then((record) => assertEqualChunks(record!, file)));
+    it("gets the specified record", async () => {
+      await service.updateRecord(file);
+      await assertEqualChunks((await service.getRecordById(file.id))!, file);
+    });
 
-    it("gets undefined if the record does not exist", () =>
-       expect(service.getRecordById("not"),
-              "record should not exist").to.eventually.be.undefined);
+    it("gets undefined if the record does not exist", async () =>
+       expect(await service.getRecordById("not"),
+              "record should not exist").to.be.undefined);
   });
 
   describe("#loadFromFile", () => {
-    function check(record: Chunk): Promise<void> {
+    async function check(record: Chunk): Promise<void> {
       expect(record, "record should have an id").
         to.have.property("id").not.be.undefined;
-      return expect(readFile(record.file))
-      // tslint:disable-next-line:no-any
-        .to.eventually.equal("something") as any;
+      expect(await readFile(record.file)).to.equal("something");
     }
 
     it("loads into a new record", () =>
        service.loadFromFile(new File(["something"], "foo")).then(check));
 
-    it("loads into an existing record", () => {
+    it("loads into an existing record", async () => {
       const newFile = new File(["something"], "newfile");
-      return service.loadFromFile(newFile)
-        .then((record) =>
-              Promise.all([
-                check(record),
-                expect(service.recordCount).to.eventually.equal(1)
-                  .then(async () => {
-                    const otherRecord = await service.loadFromFile(newFile);
-                    expect(otherRecord.id).to.equal(record.id);
-                    return expect(await service.recordCount).to.equal(1);
-                  }),
-              ]));
+      const record = await service.loadFromFile(newFile);
+      await check(record);
+      expect(await service.recordCount).to.equal(1);
+      const otherRecord = await service.loadFromFile(newFile);
+      expect(otherRecord.id).to.equal(record.id);
+      expect(await service.recordCount).to.equal(1);
     });
   });
 
   describe("#clear", () => {
-    it("clears the database", () =>
-       service.updateRecord(file)
-       .then(() => expect(service.recordCount).to.eventually.equal(1))
-       .then(() => service.clear())
-       .then(() => expect(service.recordCount).to.eventually.equal(0)));
+    it("clears the database", async () => {
+      await service.updateRecord(file);
+      expect(await service.recordCount).to.equal(1);
+      await service.clear();
+      expect(await service.recordCount).to.equal(0);
+    });
   });
 
   describe("#recordCount", () => {
-    it("provides a count of 0 when the database is empty", () =>
-       expect(service.recordCount).to.eventually.equal(0));
+    it("provides a count of 0 when the database is empty", async () =>
+       expect(await service.recordCount).to.equal(0));
 
-    it("provides the count of records", () => Promise.resolve()
-       .then(() => loadRecords(3))
-       .then(() => expect(service.recordCount).to.eventually.deep.equal(3)));
+    it("provides the count of records", async () => {
+      await loadRecords(3);
+      expect(await service.recordCount).to.equal(3);
+    });
   });
 });

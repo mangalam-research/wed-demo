@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 import { first } from "rxjs/operators/first";
@@ -76,14 +75,13 @@ describe("PacksService", () => {
   afterEach(() => db.delete().then(() => db.open()));
 
   describe("#makeRecord", () => {
-    it("records metadata into a chunk", () =>
-       expect(chunkService.getRecordById(files["foo"].metadata!)
-              .then((chunk) => chunk!.getData()))
-       .to.eventually.equal(metadata));
+    it("records metadata into a chunk", async () =>
+       expect(await (await chunkService.getRecordById(files["foo"].metadata!))!
+              .getData()).to.equal(metadata));
 
-    it("records schema into a chunk", () =>
-       expect(chunkService.getRecordById(files["foo"].schema)
-              .then((chunk) => chunk!.getData())).to.eventually.equal(schema));
+    it("records schema into a chunk", async () =>
+       expect(await (await chunkService.getRecordById(files["foo"].schema))!
+              .getData()).to.equal(schema));
   });
 
   describe("#getMatchObservable returns an observable that", () => {
@@ -102,10 +100,10 @@ describe("PacksService", () => {
               .pipe(first()).toPromise())
        .to.have.property("id").equal(files["foo"].id));
 
-    it("matches automatically if there is an explicit match set", () =>
-       expect(service.getMatchObservable("moo", "moouri").pipe(first())
+    it("matches automatically if there is an explicit match set", async () =>
+       expect(await service.getMatchObservable("moo", "moouri").pipe(first())
               .toPromise())
-       .to.eventually.have.property("id").equal(files["moo"].id));
+       .to.have.property("id").equal(files["moo"].id));
 
     it("adjusts when packs are modified", async () => {
       const observable = service.getMatchObservable("moo", "moouri");
@@ -151,26 +149,23 @@ describe("PacksService", () => {
         // tslint:disable-next-line:no-any
         let record: any;
         let downloadFile: Pack;
-        beforeEach(() => {
+        beforeEach(async () => {
           record = records[testCase];
           const stringified = JSON.stringify(record);
-          return service.makeRecord(record.name, stringified)
-            .then((newFile) => downloadFile = newFile)
-            .then(() => service.updateRecord(downloadFile));
+          downloadFile = await service.makeRecord(record.name, stringified);
+          return service.updateRecord(downloadFile);
         });
 
-        it("returns the right data", () =>
-           service.getDownloadData(downloadFile)
-           .then((data) => JSON.parse(data))
-           .then((parsed) => expect(parsed)
-                 // We have to stringify and parse again because ``undefined``
-                 // is lost in the process. So ``parsed`` won't have any field
-                 // with an undefined value.
-                 .to.deep.equal(JSON.parse(JSON.stringify(record)))));
+        it("returns the right data", async () => {
+          expect(JSON.parse(await service.getDownloadData(downloadFile)))
+          // We have to stringify and parse again because ``undefined``
+          // is lost in the process. So ``parsed`` won't have any field
+          // with an undefined value.
+            .to.deep.equal(JSON.parse(JSON.stringify(record)));
+        });
 
-        it("round-trips with makeRecord", () =>
-           service.getDownloadData(downloadFile)
-           .then((data) => service.makeRecord("", data)));
+        it("round-trips with makeRecord", async () =>
+           service.makeRecord("", await service.getDownloadData(downloadFile)));
       });
     }
   });

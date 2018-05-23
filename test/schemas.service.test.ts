@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -15,23 +14,23 @@ describe("SchemasService", () => {
   let service: SchemasService;
   let file: Schema;
 
-  before(() => {
+  before(async () => {
     chunkService = new ChunksService();
     service = new SchemasService(chunkService);
-    return service.makeRecord("foo", "bar")
-      .then((newFile) => file = newFile)
-      .then(() => service.updateRecord(file));
+    file = await service.makeRecord("foo", "bar");
+    await service.updateRecord(file);
   });
 
   after(() => db.delete().then(() => db.open()));
 
-  it("saves a record", () =>
-     service.getRecordByName("foo")
-     .then((md) => chunkService.getRecordById(md!.chunk))
-     .then((chunk) => expect(chunk!.getData()).to.eventually.equal("bar")));
+  it("saves a record", async () => {
+    const md = await service.getRecordByName("foo");
+    const chunk = await chunkService.getRecordById(md!.chunk);
+    expect(await chunk!.getData()).to.equal("bar");
+  });
 
   describe("#getDownloadData", () => {
-    it("returns the right data", () =>
-       expect(service.getDownloadData(file)).to.eventually.equal("bar"));
+    it("returns the right data", async () =>
+       expect(await service.getDownloadData(file)).to.equal("bar"));
   });
 });

@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 import { elementAt } from "rxjs/operators/elementAt";
 
@@ -18,40 +17,40 @@ describe("ProcessingService", () => {
   });
 
   describe("#start", () => {
-    it("fails when called with 0", () =>
+    it("fails when called with 0", async () =>
        expect(() => {
          service.start(0);
        }).to.throw(Error, /cannot start processing with a total of 0/));
 
-    it("fails when already started", () => {
+    it("fails when already started", async () => {
       service.start(10);
       expect(() => {
         service.start(10);
       }).to.throw(Error, /there is already something in progress/);
     });
 
-    it("emits a change", () => {
+    it("emits a change", async () => {
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
       const ret = service.state.pipe(elementAt(1)).toPromise();
       service.start(10);
-      return expect(ret).to.eventually.deep.equal({ total: 10, count: 0 });
+      expect(await ret).to.deep.equal({ total: 10, count: 0 });
     });
   });
 
   describe("#stop", () => {
-    it("emits a change", () => {
+    it("emits a change", async () => {
       service.start(10);
       // elementAt(1): we need to skip the default that is automatically emitted
       // on subscription.
       const ret = service.state.pipe(elementAt(1)).toPromise();
       service.stop();
-      return expect(ret).to.eventually.deep.equal({ total: 0, count: 0 });
+      expect(await ret).to.deep.equal({ total: 0, count: 0 });
     });
   });
 
   describe("#increment", () => {
-    it("fails when called and nothing is in progress", () =>
+    it("fails when called and nothing is in progress", async () =>
        expect(() => {
          service.increment();
        }).to.throw(Error,

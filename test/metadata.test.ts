@@ -1,5 +1,4 @@
 import "chai";
-import "chai-as-promised";
 import "mocha";
 
 const expect = chai.expect;
@@ -37,42 +36,38 @@ describe("Metadata", () => {
 
   let metadata1: Metadata;
 
-  before(() => {
-    return Promise.all(
+  before(async () => {
+    const chunks  = await Promise.all(
       [Chunk.makeChunk(new File([content], "a")),
-       Chunk.makeChunk(new File([different], "b"))])
-      .then((chunks) => Promise.all(chunks.map((x) => db.chunks.put(x)))
-            .then(() => chunks))
-      .then(([a, b]) => {
-        contentChunk = a;
-        differentChunk = b;
-        metadata1 = new Metadata("a", contentChunk);
-      });
+       Chunk.makeChunk(new File([different], "b"))]);
+    await Promise.all(chunks.map((x) => db.chunks.put(x)));
+    [contentChunk, differentChunk] = chunks;
+    metadata1 = new Metadata("a", contentChunk);
   });
 
   after(() => db.delete().then(() => db.open()));
 
   it("instances have a Metadata type",
-     () => expect(metadata1.recordType).to.equal("Metadata"));
+     async () => expect(metadata1.recordType).to.equal("Metadata"));
 
   it("to have a generator value which is extracted from the data",
-     () => expect(metadata1.getGenerator()).to.eventually.equal("gen1"));
+     async () => expect(await metadata1.getGenerator()).to.equal("gen1"));
 
   it("to have a creationDate which is extracted from the data",
-     () => expect(metadata1.getCreationDate()).to.eventually.equal("date1"));
+     async () => expect(await metadata1.getCreationDate()).to.equal("date1"));
 
   it("to have a version which is extracted from the data",
-     () => expect(metadata1.getVersion()).to.eventually.equal("ver1"));
+     async () => expect(await metadata1.getVersion()).to.equal("ver1"));
 
   it("to have namespaces extracted from the data",
-     () => expect(metadata1.getNamespaces()).to.eventually.deep.equal({
+     async () => expect(await metadata1.getNamespaces()).to.deep.equal({
        foo: "foouri",
        bar: "baruri",
      }));
 
   it("to have prefixNamespacePairs extracted from the data",
-     () => expect(metadata1.getPrefixNamespacePairs())
-     .to.eventually.deep.equal([
+     async () => expect(await metadata1.getPrefixNamespacePairs())
+     .to.deep.equal([
        {
          prefix: "foo",
          uri: "foouri",
@@ -83,8 +78,8 @@ describe("Metadata", () => {
        },
      ]));
 
-  it("setting the chunk changes the data", () => {
+  it("setting the chunk changes the data", async () => {
     metadata1.chunk = differentChunk.id;
-    return expect(metadata1.getGenerator()).to.eventually.equal("gen2");
+    expect(await metadata1.getGenerator()).to.equal("gen2");
   });
 });
