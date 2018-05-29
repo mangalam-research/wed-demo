@@ -60,7 +60,7 @@
     "@types/jquery": "^3.3.2",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.2",
-    "@types/sinon": "^4.3.3",
+    "@types/sinon": "^5.0.0",
     "@types/sinon-chai": "^2.7.31",
     "chai": "^4.1.2",
     "child-process-promise": "^2.2.1",
