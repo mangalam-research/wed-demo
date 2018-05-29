@@ -45,15 +45,13 @@ describe("GenericRecordsComponent", () => {
   // Since it is a generic, we test it through XMLFilesComponent.
   let component: XMLFilesComponent;
   let fixture: ComponentFixture<XMLFilesComponent>;
-  let sandbox: sinon.SinonSandbox;
   let recordsService: XMLFilesService;
   let fakeConfirmer: sinon.SinonStub;
   let records: XMLFile[];
   let router: Router;
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([]),
@@ -91,6 +89,7 @@ describe("GenericRecordsComponent", () => {
   });
 
   afterEach(() => {
+    sinon.restore();
     fixture.detectChanges();
     return fixture.whenStable()
       .then(() => {
@@ -122,7 +121,7 @@ describe("GenericRecordsComponent", () => {
 
   describe("#download", () => {
     it("triggers a download with the right data", async () => {
-      const stub = sandbox.stub(component, "triggerDownload" as any);
+      const stub = sinon.stub(component, "triggerDownload" as any);
       await component.download(records[0]);
       expect(stub).to.have.been.calledWith("a", "foo");
     });
@@ -132,7 +131,7 @@ describe("GenericRecordsComponent", () => {
 
   describe("#upload", () => {
     it("is a no-op if there are no files", async () => {
-      const stub = sandbox.stub(recordsService, "safeLoadFromFile");
+      const stub = sinon.stub(recordsService, "safeLoadFromFile");
       await component.upload(records[0], {
         target: {
           files: undefined,
@@ -170,7 +169,7 @@ describe("GenericRecordsComponent", () => {
     });
 
     it("uses the processing service", async () => {
-      const stub = sandbox.stub(FakeProcessingService.prototype);
+      const stub = sinon.stub(FakeProcessingService.prototype);
       await component.upload(records[0], {
         target: {
           files: [new File(["new data"], "new file")],
@@ -185,7 +184,7 @@ describe("GenericRecordsComponent", () => {
 
   describe("#showDetails", () => {
     it("changes the route to the record", () => {
-      const stub = sandbox.stub(router);
+      const stub = sinon.stub(router);
       component.showDetails(records[0]);
       expect((stub as any).navigate.firstCall)
         .to.have.been.calledWith([".", records[0].id],

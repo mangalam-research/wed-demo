@@ -13,7 +13,6 @@ import { UpgradeService } from "dashboard/upgrade.service";
 
 describe("UpgradeService", () => {
   let service: UpgradeService;
-  let sandbox: sinon.SinonSandbox;
   let fakeAlert: sinon.SinonStub;
   let downloadStub: sinon.SinonStub;
   let confirmService: ConfirmService;
@@ -24,20 +23,18 @@ describe("UpgradeService", () => {
   });
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    fakeAlert = sandbox.stub();
+    fakeAlert = sinon.stub();
     fakeAlert.returns(Promise.resolve());
     confirmService = new ConfirmService(undefined, undefined, fakeAlert);
     service = new UpgradeService(confirmService);
-    downloadStub = sandbox.stub(service, "download").returns(Promise.resolve());
-    sandbox.stub(service, "reload");
+    downloadStub = sinon.stub(service, "download").returns(Promise.resolve());
+    sinon.stub(service, "reload");
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
+    return db.delete().then(() => db.open());
   });
-
-  afterEach(() => db.delete().then(() => db.open()));
 
   it("does not act if there is no need for an upgrade", () =>
      service.upgrade().then(() => {

@@ -39,12 +39,10 @@ class FakeProcessingService {
 describe("UploadComponent", () => {
   let component: UploadComponent;
   let fixture: ComponentFixture<UploadComponent>;
-  let sandbox: sinon.SinonSandbox;
   let fakeConfirmer: sinon.SinonStub;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     TestBed.configureTestingModule({
       declarations: [ UploadComponent ],
       providers: [
@@ -62,7 +60,7 @@ describe("UploadComponent", () => {
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   //
@@ -77,7 +75,7 @@ describe("UploadComponent", () => {
   //
 
   it("a change event without files is a no-op", () => {
-    const spy = sandbox.stub(FakeLoader.prototype, "safeLoadFromFile");
+    const spy = sinon.stub(FakeLoader.prototype, "safeLoadFromFile");
     // tslint:disable-next-line:no-floating-promises
     component.change({
       target: {
@@ -95,7 +93,7 @@ describe("UploadComponent", () => {
   });
 
   it("performs a load for each file", () => {
-    const spy = sandbox.stub(FakeLoader.prototype, "safeLoadFromFile");
+    const spy = sinon.stub(FakeLoader.prototype, "safeLoadFromFile");
     spy.returns(Promise.resolve());
     return component.change({
       target: {
@@ -109,7 +107,7 @@ describe("UploadComponent", () => {
   });
 
   it("passes the file to load and the confirmer to safeLoadFromFile", () => {
-    const spy = sandbox.stub(FakeLoader.prototype, "safeLoadFromFile");
+    const spy = sinon.stub(FakeLoader.prototype, "safeLoadFromFile");
     spy.returns(Promise.resolve());
     // We have to call the confirmer because the code being tested ``.bind``s it
     // and thus we cannot just check what is passed to safeLoadFromFile.
@@ -126,7 +124,7 @@ describe("UploadComponent", () => {
   });
 
   it("uses the processing service", () => {
-    const stub = sandbox.stub(FakeProcessingService.prototype);
+    const stub = sinon.stub(FakeProcessingService.prototype);
     return component.change({
       target: {
         files: [new File(["one"], "one"),

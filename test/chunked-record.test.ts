@@ -16,7 +16,6 @@ import { expectReject } from "./util";
 
 // We use XMLFile to test ChunkedRecord.
 describe("ChunkedRecord", () => {
-  let sandbox: sinon.SinonSandbox;
   let chunkOne: Chunk;
   let chunkTwo: Chunk;
   let one: XMLFile;
@@ -38,12 +37,8 @@ describe("ChunkedRecord", () => {
 
   after(() => db.delete().then(() => db.open()));
 
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it("#chunk is correct",
@@ -56,7 +51,7 @@ describe("ChunkedRecord", () => {
      () => expectReject(bad.getData(), Error, /missing chunk/));
 
   it("#data caches db accesses", () => {
-    const spy = sandbox.spy(db.chunks, "get");
+    const spy = sinon.spy(db.chunks, "get");
     const newFile = new XMLFile("a", chunkOne.id);
     return newFile.getData()
       .then(() => {
@@ -67,7 +62,7 @@ describe("ChunkedRecord", () => {
   });
 
   it("#data resets its cache when #chunk is set", () => {
-    const spy = sandbox.spy(db.chunks, "get");
+    const spy = sinon.spy(db.chunks, "get");
     const newFile = new XMLFile("a", chunkOne.id);
     return newFile.getData()
       .then(() => {
@@ -79,7 +74,7 @@ describe("ChunkedRecord", () => {
   });
 
   it("#data does not reset its cache when #chunk is set to same value", () => {
-    const spy = sandbox.spy(db.chunks, "get");
+    const spy = sinon.spy(db.chunks, "get");
     const newFile = new XMLFile("a", chunkOne.id);
     return newFile.getData()
       .then(() => {

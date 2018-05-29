@@ -35,7 +35,6 @@ describe("PacksComponent", () => {
   let fixture: ComponentFixture<PacksComponent>;
   let de: DebugElement;
   let el: HTMLElement;
-  let sandbox: sinon.SinonSandbox;
   let packsService: PacksService;
   let fakeConfirmer: sinon.SinonStub;
   let records: Pack[];
@@ -79,8 +78,7 @@ describe("PacksComponent", () => {
   const state: ComponentTestState = Object.create(null);
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     fakeConfirmer.returns(Promise.resolve(true));
     TestBed.configureTestingModule({
       imports: [
@@ -114,13 +112,16 @@ describe("PacksComponent", () => {
     state.fixture = fixture;
     state.el = el;
     state.recordsService = packsService;
-    state.sandbox = sandbox;
+    state.sandbox = sinon;
     // Wait until the component has refreshed.
     await waitFor(() => component.records != null &&
                   component.records.length !== 0);
   });
 
-  afterEach(() => db.delete().then(() => db.open()));
+  afterEach(() => {
+    sinon.restore();
+    return db.delete().then(() => db.open());
+  });
 
   // tslint:disable-next-line:mocha-no-side-effect-code
   renderTests.make(state);

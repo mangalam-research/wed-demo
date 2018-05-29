@@ -80,7 +80,6 @@ describe("PackDetailsComponent", () => {
   let fixture: ComponentFixture<PackDetailsComponent>;
   let de: DebugElement;
   let el: HTMLElement;
-  let sandbox: sinon.SinonSandbox;
   let packsService: PacksService;
   let modesService: ModesService;
   let schemasService: SchemasService;
@@ -119,10 +118,6 @@ describe("PackDetailsComponent", () => {
     metadata: metadataSerialized,
     mode: "generic",
   };
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
 
   beforeEach(async () => {
     activatedRoute = new ActivatedRouteStub();
@@ -179,7 +174,7 @@ describe("PackDetailsComponent", () => {
   });
 
   afterEach(async () => {
-    sandbox.restore();
+    sinon.restore();
     if (fixture !== undefined) {
       fixture.detectChanges();
       await fixture.whenStable();
@@ -339,7 +334,7 @@ describe("PackDetailsComponent", () => {
       schemas = await schemasService.getNameIdArray();
       await createComponent("new");
       // tslint:disable-next-line:no-any
-      getChoice = sandbox.stub(component, "getChoice" as any);
+      getChoice = sinon.stub(component, "getChoice" as any);
       field = component.form.get("schema")!;
       expect(field.value).to.be.null;
     });
@@ -378,7 +373,7 @@ describe("PackDetailsComponent", () => {
       metadata = await metadataService.getNameIdArray();
       await createComponent("new");
       // tslint:disable-next-line:no-any
-      getChoice = sandbox.stub(component, "getChoice" as any);
+      getChoice = sinon.stub(component, "getChoice" as any);
       field = component.form.get("metadata")!;
       expect(field.value).to.be.null;
     });
@@ -432,7 +427,7 @@ describe("PackDetailsComponent", () => {
         fixture.detectChanges();
         await fixture.whenStable();
 
-        const stub = sandbox.stub(router, "navigate");
+        const stub = sinon.stub(router, "navigate");
         stub.returns(Promise.resolve(true));
         const newRecord = await component.onSubmit(new Event("click"));
         expect(newRecord).to.not.be.null;

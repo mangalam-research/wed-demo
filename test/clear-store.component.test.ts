@@ -23,12 +23,10 @@ describe("ClearStoreComponent", () => {
   let fixture: ComponentFixture<ClearStoreComponent>;
   let de: DebugElement;
   let el: HTMLElement;
-  let sandbox: sinon.SinonSandbox;
   let fakeConfirmer: sinon.SinonStub;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     TestBed.configureTestingModule({
       declarations: [ ClearStoreComponent ],
       providers: [
@@ -47,11 +45,11 @@ describe("ClearStoreComponent", () => {
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it("does not clear if the user answers negatively", () => {
-    const spy = sandbox.spy(FakeClearable.prototype, "clear");
+    const spy = sinon.spy(FakeClearable.prototype, "clear");
     fakeConfirmer.returns(Promise.resolve(false));
     return component.clear().then(() => {
       expect(fakeConfirmer).to.have.been.calledOnce;
@@ -60,7 +58,7 @@ describe("ClearStoreComponent", () => {
   });
 
   it("clears if the user answers positively", () => {
-    const spy = sandbox.spy(FakeClearable.prototype, "clear");
+    const spy = sinon.spy(FakeClearable.prototype, "clear");
     fakeConfirmer.returns(Promise.resolve(true));
     return component.clear().then(() => {
       expect(fakeConfirmer).to.have.been.calledOnce;

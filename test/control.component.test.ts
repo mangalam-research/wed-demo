@@ -44,7 +44,6 @@ describe("ControlComponent", () => {
   let fixture: ComponentFixture<ControlComponent>;
   let de: DebugElement;
   let el: HTMLElement;
-  let sandbox: sinon.SinonSandbox;
   let packsService: PacksService;
   let xmlFilesService: XMLFilesService;
   let metadataService: MetadataService;
@@ -83,8 +82,7 @@ describe("ControlComponent", () => {
   const packA = JSON.stringify(packAUnserialized);
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     TestBed.configureTestingModule({
       declarations: [ ControlComponent ],
       providers: [
@@ -132,7 +130,7 @@ describe("ControlComponent", () => {
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     return db.delete().then(() => db.open());
   });
 
@@ -193,7 +191,7 @@ describe("ControlComponent", () => {
 
   describe("#download", () => {
     it("triggers a download with the right data", async () => {
-      const stub = sandbox.stub(component, "triggerDownload");
+      const stub = sinon.stub(component, "triggerDownload");
       const dump = await component.dump();
       component.download();
       return waitForSuccess(
@@ -244,7 +242,7 @@ describe("ControlComponent", () => {
 
     it("does not load if confirmation is denied", async () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      const stub = sandbox.stub(component, "load");
+      const stub = sinon.stub(component, "load");
       await component.change({
         target: {
           files: [new File(["{}"], "x")],
@@ -257,7 +255,7 @@ describe("ControlComponent", () => {
 
     it("loads if confirmation is given", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      const stub = sandbox.stub(component, "load");
+      const stub = sinon.stub(component, "load");
       await component.change({
         target: {
           files: [new File([emptyDump], "x")],
@@ -284,7 +282,7 @@ describe("ControlComponent", () => {
 
     it("uses the processing service", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      const stub = sandbox.stub(FakeProcessingService.prototype);
+      const stub = sinon.stub(FakeProcessingService.prototype);
       await component.change({
         target: {
           files: [new File([emptyDump], "x")],
@@ -300,7 +298,7 @@ describe("ControlComponent", () => {
 
     it("shows an alert if the data is incorrect", async () => {
       fakeConfirmer.returns(Promise.resolve(true));
-      const stub = sandbox.stub(FakeProcessingService.prototype);
+      const stub = sinon.stub(FakeProcessingService.prototype);
       await component.change({
         target: {
           files: [new File(["{}"], "x")],
@@ -343,7 +341,7 @@ describe("ControlComponent", () => {
 
   describe("handles events:", () => {
     it("initiates a download when the download button is clicked", () => {
-      const downloadStub = sandbox.stub(component, "triggerDownload");
+      const downloadStub = sinon.stub(component, "triggerDownload");
       const downloadButton =
         el.querySelector(".btn.download-button")! as HTMLAnchorElement;
       downloadButton.click();
@@ -357,7 +355,7 @@ describe("ControlComponent", () => {
 
     it("initiates a clear operation when the clear button is clicked", () => {
       fakeConfirmer.returns(Promise.resolve(false));
-      const clearStub = sandbox.stub(component, "clear");
+      const clearStub = sinon.stub(component, "clear");
       const clearButton =
         el.querySelector(".btn.clear-button")! as HTMLAnchorElement;
       clearButton.click();

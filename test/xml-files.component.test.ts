@@ -47,7 +47,6 @@ describe("XMLFilesComponent", () => {
   let fixture: ComponentFixture<XMLFilesComponent>;
   let de: DebugElement;
   let el: HTMLElement;
-  let sandbox: sinon.SinonSandbox;
   let packsService: PacksService;
   let recordsService: XMLFilesService;
   let fakeConfirmer: sinon.SinonStub;
@@ -90,10 +89,9 @@ describe("XMLFilesComponent", () => {
   });
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    fakeConfirmer = sandbox.stub();
+    fakeConfirmer = sinon.stub();
     fakeConfirmer.returns(Promise.resolve(true));
-    fakePrompter = sandbox.stub();
+    fakePrompter = sinon.stub();
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([]),
@@ -138,7 +136,7 @@ describe("XMLFilesComponent", () => {
     state.fixture = fixture;
     state.el = el;
     state.recordsService = recordsService;
-    state.sandbox = sandbox;
+    state.sandbox = sinon;
     // Wait until the component has refreshed.
     await waitFor(() => component.records != null &&
                   component.records.length !== 0);
@@ -146,6 +144,7 @@ describe("XMLFilesComponent", () => {
   });
 
   afterEach(async () => {
+    sinon.restore();
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.destroy();
@@ -172,7 +171,7 @@ describe("XMLFilesComponent", () => {
     let goToStub: sinon.SinonStub;
     beforeEach(() => {
       // tslint:disable-next-line:no-any
-      goToStub = sandbox.stub(component, "goTo" as any);
+      goToStub = sinon.stub(component, "goTo" as any);
     });
 
     it("fails if the file has no pack associated with it", async () => {
@@ -183,7 +182,7 @@ describe("XMLFilesComponent", () => {
     });
 
     it("fails if the the pack is missing", async () => {
-      const stub = sandbox.stub(packsService, "getRecordById");
+      const stub = sinon.stub(packsService, "getRecordById");
       stub.returns(Promise.resolve(undefined));
       component.records[0].pack = -999;
       await expectReject(component.edit(component.records[0]),
@@ -212,8 +211,8 @@ describe("XMLFilesComponent", () => {
 
     it("is a no-op if the file name is the empty string", async () => {
       fakePrompter.returns(Promise.resolve(""));
-      const writeStub = sandbox.stub(recordsService, "writeCheck");
-      const updateSpy = sandbox.stub(recordsService, "updateRecord");
+      const writeStub = sinon.stub(recordsService, "writeCheck");
+      const updateSpy = sinon.stub(recordsService, "updateRecord");
       await component.newFile();
       expect(fakePrompter.callCount).to.equal(1);
       expect(writeStub.callCount).to.equal(0);
@@ -222,8 +221,8 @@ describe("XMLFilesComponent", () => {
 
     it("is a no-op if the write check is negative", async () => {
       fakePrompter.returns(Promise.resolve(records[0].name));
-      const writeStub = sandbox.stub(recordsService, "writeCheck");
-      const updateSpy = sandbox.stub(recordsService, "updateRecord");
+      const writeStub = sinon.stub(recordsService, "writeCheck");
+      const updateSpy = sinon.stub(recordsService, "updateRecord");
       writeStub.returns(Promise.resolve({ write: false, record: null }));
       await component.newFile();
       expect(writeStub.callCount).to.equal(1);
@@ -232,8 +231,8 @@ describe("XMLFilesComponent", () => {
 
     it("saves the file if write check is positive", async () => {
       fakePrompter.returns(Promise.resolve(records[0].name));
-      const writeStub = sandbox.stub(recordsService, "writeCheck");
-      const updateSpy = sandbox.spy(recordsService, "updateRecord");
+      const writeStub = sinon.stub(recordsService, "writeCheck");
+      const updateSpy = sinon.spy(recordsService, "updateRecord");
       writeStub.returns(Promise.resolve({ write: true, record: records[0] }));
       await component.newFile();
       expect(writeStub.callCount).to.equal(1);
@@ -368,7 +367,7 @@ describe("XMLFilesComponent", () => {
   describe("handles events:", () => {
     it("navigates to the editor when edit button is clicked", async () => {
       // tslint:disable-next-line:no-any
-      const goToStub = sandbox.stub(component, "goTo" as any);
+      const goToStub = sinon.stub(component, "goTo" as any);
       const pack = await packsService.getRecordById(component.records[0].pack!);
       const editButton =
         el.querySelector(".btn.edit-button")! as HTMLAnchorElement;
