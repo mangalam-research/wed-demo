@@ -1,7 +1,7 @@
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Params } from "@angular/router";
-import { switchMap } from "rxjs/operators/switchMap";
+import { switchMap } from "rxjs/operators";
 
 import { Schema } from "../schema";
 import { SchemasService } from "../schemas.service";

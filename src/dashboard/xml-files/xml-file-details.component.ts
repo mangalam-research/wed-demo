@@ -2,8 +2,8 @@ import { Location } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Params } from "@angular/router";
-import { switchMap } from "rxjs/operators/switchMap";
-import { Subscription } from "rxjs/Subscription";
+import { Subscription } from "rxjs";
+import { switchMap } from "rxjs/operators";
 
 import { NameIdArray, PacksService } from "../packs.service";
 import { updateFormErrors } from "../util";

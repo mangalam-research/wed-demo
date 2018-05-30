@@ -7,8 +7,7 @@
 "use strict";
 
 import Dexie from "dexie"; // tslint:disable-line:import-name
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
+import { Observable, Subject } from "rxjs";
 
 import { readFile } from "./store-util";
 

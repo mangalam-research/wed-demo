@@ -7,9 +7,8 @@
 "use strict";
 
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs/Observable";
-import { defer } from "rxjs/observable/defer";
-import { concatMap } from "rxjs/operators/concatMap";
+import { defer, Observable } from "rxjs";
+import { concatMap } from "rxjs/operators";
 import { BaseName, constructTree, Event, Grammar } from "salve";
 
 import { Chunk } from "./chunk";
@@ -77,7 +76,7 @@ export class PacksService extends DBService<Pack, number> {
       const { localName, namespaceURI } = pack.match;
       if (localName === "") {
         const walker = (await this.getGrammarForSchema(schemaID)).newWalker();
-        const possible: Event[] = walker.possible().toArray();
+        const possible: Event[] = Array.from(walker.possible());
         for (const event of possible) {
           if (event.params[0] === "enterStartTag") {
             const name = event.params[1] as BaseName;

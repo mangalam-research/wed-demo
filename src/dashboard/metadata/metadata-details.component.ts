@@ -1,7 +1,7 @@
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Params } from "@angular/router";
-import { switchMap } from "rxjs/operators/switchMap";
+import { switchMap } from "rxjs/operators";
 
 import { Metadata } from "../metadata";
 import { MetadataService } from "../metadata.service";

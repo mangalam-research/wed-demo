@@ -7,13 +7,8 @@
 
 import { Component, Inject, Optional } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable } from "rxjs/Observable";
-import { defer } from "rxjs/observable/defer";
-import { from } from "rxjs/observable/from";
-import { concatMap } from "rxjs/operators/concatMap";
-import { first } from "rxjs/operators/first";
-import { map } from "rxjs/operators/map";
-import { startWith } from "rxjs/operators/startWith";
+import { defer, from, Observable } from "rxjs";
+import { concatMap, first, map, startWith } from "rxjs/operators";
 
 import { ConfirmService } from "../confirm.service";
 import { GenericRecordsComponent } from "../generic-records.component";

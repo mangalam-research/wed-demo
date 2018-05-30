@@ -1,7 +1,7 @@
 import "chai";
 import "mocha";
 
-import { first } from "rxjs/operators/first";
+import { first } from "rxjs/operators";
 
 chai.config.truncateThreshold = 0;
 const expect = chai.expect;

@@ -1,6 +1,6 @@
 import "chai";
 import "mocha";
-import { elementAt } from "rxjs/operators/elementAt";
+import { elementAt } from "rxjs/operators";
 
 const expect = chai.expect;
 

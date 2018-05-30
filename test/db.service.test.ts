@@ -1,6 +1,6 @@
 import "chai";
 import "mocha";
-import { first } from "rxjs/operators/first";
+import { first } from "rxjs/operators";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 

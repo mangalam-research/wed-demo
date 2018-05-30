@@ -19,9 +19,8 @@ import { BrowserDynamicTestingModule,
 import { ActivatedRoute, convertToParamMap, ParamMap,
          Router } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-import { first } from "rxjs/operators/first";
+import { BehaviorSubject, Observable } from "rxjs";
+import { first } from "rxjs/operators";
 
 import { db } from "dashboard/store";
 

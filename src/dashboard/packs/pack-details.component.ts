@@ -4,11 +4,8 @@ import { Component, ComponentFactory, ComponentFactoryResolver, OnInit,
 import { AbstractControl, FormBuilder, FormGroup,
          Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-import { first } from "rxjs/operators/first";
-import { switchMap } from "rxjs/operators/switchMap";
-import { Subscription } from "rxjs/Subscription";
+import { BehaviorSubject, Observable, Subscription } from "rxjs";
+import { first, switchMap } from "rxjs/operators";
 
 import { ChunksService } from "../chunks.service";
 import { Choice, DialogChoiceComponent,
