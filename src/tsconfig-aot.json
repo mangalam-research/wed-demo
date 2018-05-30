@@ -2,12 +2,15 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../build/aot/",
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "noEmitOnError": false
   },
   "angularCompilerOptions": {
-    "genDir": "../build/aot/",
     "entryModule": "dashboard/app.module#AppModule",
-    "skipMetadataEmit": false,
-    "strictMetadataEmit": true
+    "strictMetadataEmit": true,
+    "strictInjectionParameters": true,
+    "fullTemplateTypeCheck": true,
+    "preserveWhitespaces": true,
+    "annotationsAs": "decorators"
   }
 }

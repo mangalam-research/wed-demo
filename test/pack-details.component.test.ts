@@ -6,15 +6,16 @@ import * as sinonChai from "sinon-chai";
 chai.use(sinonChai);
 
 const expect = chai.expect;
-
 import { Location } from "@angular/common";
-import { ComponentFactoryResolver, DebugElement,
+import { DebugElement,
          Injectable } from "@angular/core";
 import { ComponentFixture, ComponentFixtureAutoDetect,
          TestBed } from "@angular/core/testing";
 import { AbstractControl, FormBuilder, FormsModule,
          ReactiveFormsModule } from "@angular/forms";
 import { By } from "@angular/platform-browser";
+import { BrowserDynamicTestingModule,
+       } from "@angular/platform-browser-dynamic/testing";
 import { ActivatedRoute, convertToParamMap, ParamMap,
          Router } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
@@ -26,6 +27,7 @@ import { db } from "dashboard/store";
 
 import { ChunksService } from "dashboard/chunks.service";
 import { ClearStoreComponent } from "dashboard/clear-store.component";
+import { DialogChoiceComponent } from "dashboard/dialog-choice.component";
 import { MetadataService,
          NameIdArray as MetadataNameIdArray } from "dashboard/metadata.service";
 import { ModesService } from "dashboard/modes.service";
@@ -121,14 +123,14 @@ describe("PackDetailsComponent", () => {
 
   beforeEach(async () => {
     activatedRoute = new ActivatedRouteStub();
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([]),
         FormsModule,
         ReactiveFormsModule,
       ],
       declarations: [ ClearStoreComponent, UploadComponent,
-                      PackDetailsComponent ],
+                      PackDetailsComponent, DialogChoiceComponent ],
       providers: [
         { provide: ComponentFixtureAutoDetect, useValue: true },
         { provide: ActivatedRoute, useValue: activatedRoute },
@@ -138,12 +140,13 @@ describe("PackDetailsComponent", () => {
         PacksService,
         MetadataService,
         SchemasService,
-        ComponentFactoryResolver,
         Location,
       ],
-    });
-
-    await TestBed.compileComponents();
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [DialogChoiceComponent],
+      },
+    }).compileComponents();
 
     router = TestBed.get(Router);
     packsService = TestBed.get(PacksService);

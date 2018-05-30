@@ -4,7 +4,9 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "dashboard/*": ["../build/dev/lib/dashboard/*"]
+      "dashboard/*": ["../build/dev/lib/dashboard/*"],
+      "sinon": ["../types/sinon"],
+      "bluejax": ["../types/bluejax"]
     }
   },
   "include": [
