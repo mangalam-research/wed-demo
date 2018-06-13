@@ -110,9 +110,9 @@ requirejs-local-config}.js",
       // The (\\|\/) piece accounts for path separators in *nix and Windows
         /angular(\\|\/)core(\\|\/)@angular/,
       path.join(__dirname, "./src")),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   sourceMap: true,
-    // }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+    }),
     //
     // The way our code is currently laid out. It is not useful to use
     // this plugin. Reassess if the code is significantly changed.
