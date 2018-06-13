@@ -34,7 +34,7 @@ window.systemJSConfig = {
     "blueimp-md5": "npm:blueimp-md5",
     dexie: "npm:dexie",
     bluebird: "npm:bluebird/js/browser/bluebird.js",
-    salve: "npm:salve",
+    salve: "npm:salve/salve.min.js",
     "salve-dom": "npm:salve-dom",
     json: "npm:systemjs-plugin-json",
     slug: "npm:slug",

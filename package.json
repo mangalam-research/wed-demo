@@ -43,12 +43,12 @@
     "last-resort": "^0.1.0",
     "requirejs": ">=2.1.15 <3",
     "rxjs": "^6.2.0",
-    "salve": ">=4.1.2 <5",
-    "salve-dom": "^1.1.1",
+    "salve": "^7.0.3",
+    "salve-dom": "^3.0.0",
     "systemjs": "^0.21.3",
     "systemjs-plugin-json": "^0.3.0",
     "urijs": "^1.19.1",
-    "wed": "^1.0.0",
+    "wed": "^2.0.0",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
