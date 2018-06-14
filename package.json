@@ -22,13 +22,13 @@
     }
   ],
   "dependencies": {
-    "@angular/common": "^6.0.4",
-    "@angular/compiler": "^6.0.4",
-    "@angular/core": "^6.0.4",
-    "@angular/forms": "^6.0.4",
-    "@angular/platform-browser": "^6.0.4",
-    "@angular/platform-browser-dynamic": "^6.0.4",
-    "@angular/router": "^6.0.4",
+    "@angular/common": "6.0.3",
+    "@angular/compiler": "6.0.3",
+    "@angular/core": "6.0.3",
+    "@angular/forms": "6.0.3",
+    "@angular/platform-browser": "6.0.3",
+    "@angular/platform-browser-dynamic": "6.0.3",
+    "@angular/router": "6.0.3",
     "@types/sinon": "^4.3.3",
     "bluebird": ">=3.2.2 <4",
     "blueimp-md5": "^2.7.0",
@@ -52,7 +52,7 @@
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
-    "@angular/compiler-cli": "^6.0.4",
+    "@angular/compiler-cli": "6.0.3",
     "@types/bluebird": "^3.5.20",
     "@types/blueimp-md5": "^2.7.0",
     "@types/bootbox": "^4.4.36",
