@@ -1,4 +1,4 @@
-const gutil = require("gulp-util");
+const log = require("fancy-log");
 const fs = require("fs-extra");
 const del = require("del");
 const { execFile } = require("child-process-promise");
@@ -19,11 +19,11 @@ exports.execFileAndReport = function execFileAndReport(...args) {
   return execFile(...args)
     .then((result) => {
       if (result.stdout) {
-        gutil.log(result.stdout);
+        log(result.stdout);
       }
     }, (err) => {
       if (err.stdout) {
-        gutil.log(err.stdout);
+        log(err.stdout);
       }
       throw err;
     });
