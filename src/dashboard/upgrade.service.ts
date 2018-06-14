@@ -36,9 +36,7 @@ export class Upgrade {
         // being a write.
         return db.transaction("rw", db.packs, db.xmlfiles, () => {
           const updates: Promise<{}>[] = [];
-          // The next promise is not really floating.
-          // tslint:disable-next-line:no-floating-promises
-          this.obsoletePacks.primaryKeys()
+          return this.obsoletePacks.primaryKeys()
             .then((keys) => db.xmlfiles.where("pack").anyOf(keys)
                   .each((xmlfile) => {
                     xmlfile.pack = undefined;
@@ -46,7 +44,7 @@ export class Upgrade {
                   }))
             .then(() => Dexie.Promise.all(updates))
             .then(() => this.obsoletePacks.delete());
-        });
+        }).then(() => undefined);
       });
   }
 }
