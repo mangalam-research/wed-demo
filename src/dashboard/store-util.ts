@@ -9,7 +9,9 @@ export function readFile(file: File): Promise<string> {
     reader.onload = () => {
       resolve(reader.result);
     };
-    reader.onerror = reject;
+    reader.onerror = () => {
+      reject(reader.error);
+    };
     reader.readAsText(file);
   });
 }
