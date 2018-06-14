@@ -37,7 +37,6 @@ window.systemJSConfig = {
     salve: "npm:salve/salve.min.js",
     "salve-dom": "npm:salve-dom",
     json: "npm:systemjs-plugin-json",
-    slug: "npm:slug",
     bluejax: "npm:bluejax",
     "bluejax.try": "npm:bluejax.try",
     rangy: "npm:rangy",
