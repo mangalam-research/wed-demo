@@ -1,7 +1,7 @@
 {
   "name": "wed-demo",
   "description": "A demo for the wed editor.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "keywords": [
     "Wed",
     "RelaxNG",
